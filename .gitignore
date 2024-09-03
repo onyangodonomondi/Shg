@@ -1,0 +1,78 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django migrations
+*/migrations/*
+!*/migrations/__init__.py
+
+# SQLite database
+db.sqlite3
+*.sqlite3
+
+# Environment variables file
+.env
+*.env
+
+# Django static files
+/staticfiles/
+/media/
+
+# Local development settings
+/local_settings.py
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+.VENV/
+env.bak/
+venv.bak/
+
+# macOS files
+.DS_Store
+
+# Backup files
+*.bak
+*.swp
+*~
+
+# Logs
+*.log
+logs/
+*.out
+
+# Ignore the following by default, but keep if explicitly tracked
+!/.github/
+!.gitignore
+
+# Ignore IDE and editor-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Ignore pipenv, poetry and pip-tools files
+Pipfile
+Pipfile.lock
+poetry.lock
+*.lock
+requirements.txt
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore compiled C files
+*.so
+*.pyd
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
