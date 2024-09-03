@@ -1,0 +1,11 @@
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %} {{ adminform.form.non_field_errors }} {{ adminform.form.media
+  }}
+  <div>
+    <label for="id_csv_file">Upload CSV file:</label>
+    {{ adminform.form.csv_file }}
+  </div>
+  <button type="submit" class="button">Upload</button>
+</form>
+{{ block.super }} {% endblock %}

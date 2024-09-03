@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Profile Info and Edit Button -->
+        <div class="col-md-4">
+            <div class="card text-center p-3">
+                <h2 class="mt-3">{{ user.get_full_name }}</h2>
+                <a href="{% url 'update_profile' %}" class="btn btn-primary mt-2">Edit Profile</a>
+            </div>
+        </div>
+
+        <!-- User Info Section -->
+        <div class="col-md-8">
+            <div class="card p-4">
+                <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab" aria-controls="about" aria-selected="true">About</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button" role="tab" aria-controls="posts" aria-selected="false">Posts</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="contributions-tab" data-bs-toggle="tab" data-bs-target="#contributions" type="button" role="tab" aria-controls="contributions" aria-selected="false">Contributions</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="profileTabsContent">
+                    <!-- About Tab Content -->
+                    <div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="about-tab">
+                        <h3 class="mt-3">Bio</h3>
+                        <p>{{ user.profile.bio|default:"No bio available" }}</p>
+
+                        <h3 class="mt-4">Contact Information</h3>
+                        <ul class="list-unstyled">
+                            <li><strong>Email:</strong> {{ user.email }}</li>
+                            <li><strong>Phone:</strong> {{ user.profile.phone_number|default:"Not provided" }}</li>
+                            <li><strong>Website:</strong> <a href="{{ user.profile.website }}" target="_blank">{{ user.profile.website|default:"Not provided" }}</a></li>
+                        </ul>
+
+                        <h3 class="mt-4">Social Links</h3>
+                        <ul class="list-unstyled">
+                            {% if user.profile.social_links %}
+                                {% for key, value in user.profile.social_links.items %}
+                                <li><strong>{{ key|title }}:</strong> <a href="{{ value }}" target="_blank">{{ value }}</a></li>
+                                {% endfor %}
+                            {% else %}
+                                <li>No social links provided</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <!-- Posts Tab Content -->
+                    <div class="tab-pane fade" id="posts" role="tabpanel" aria-labelledby="posts-tab">
+                        <!-- Add content for posts (if applicable) -->
+                        <p class="mt-3">Posts content will be available soon.</p>
+                    </div>
+
+                    <!-- Contributions Tab Content -->
+                    <div class="tab-pane fade" id="contributions" role="tabpanel" aria-labelledby="contributions-tab">
+                        <h3 class="mt-3">Your Contributions</h3>
+                        {% if user_contributions %}
+                        <ul class="list-group mt-3">
+                            {% for contribution in user_contributions %}
+                            <li class="list-group-item">
+                                <strong>Event:</strong> {{ contribution.event.name }}<br>
+                                <strong>Amount:</strong> {{ contribution.amount }} Ksh<br>
+                                <strong>Status:</strong> {{ contribution.category }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="mt-3">You have not made any contributions yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

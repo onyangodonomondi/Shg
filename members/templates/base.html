@@ -1,0 +1,107 @@
+{% load static %} {% load widget_tweaks %} {% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}NYAGWA SHG{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom CSS -->
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+    {% block extra_head %} {% endblock %}
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+          <a class="navbar-brand" href="#">NYAGWA SHG</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  aria-current="page"
+                  href="{% url 'home' %}"
+                  >Home</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'events_page' %}">Events</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'contributions_page' %}"
+                  >Contributions</a
+                >
+              </li>
+              {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+              </li>
+              <li class="nav-item">
+                <!-- Logout form -->
+                <form
+                  id="logout-form"
+                  action="{% url 'logout' %}"
+                  method="POST"
+                  style="display: none"
+                >
+                  {% csrf_token %}
+                  <button type="submit">Logout</button>
+                </form>
+                <a
+                  class="nav-link"
+                  href="#"
+                  onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                  >Logout</a
+                >
+              </li>
+              {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <div class="content container mt-5">
+        {% block content %} {% endblock %}
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer text-center">
+        <div class="container p-4">
+          <p class="text-center mb-0">
+            &copy; 2024 NYAGWA SHG. All rights reserved.
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %} {% endblock %}
+  </body>
+</html>

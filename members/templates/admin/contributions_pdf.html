@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Contributions Report</title>
+    <style>
+      @page {
+        size: landscape; /* Make the page landscape */
+        margin: 20mm; /* Set the page margins */
+      }
+      body {
+        font-family: Arial, sans-serif;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      td {
+        white-space: nowrap;
+      } /* Prevent line breaks in table cells */
+    </style>
+  </head>
+  <body>
+    <h1>Contributions Report</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Member Name</th>
+          <th>Event</th>
+          <th>Amount</th>
+          <th>Required Amount</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contribution in contributions %}
+        <tr>
+          <td>
+            {{ contribution.member.surname }} {{ contribution.member.first_name
+            }}
+          </td>
+          <td>{{ contribution.event.name }}</td>
+          <td>{{ contribution.amount }}</td>
+          <td>{{ contribution.event.required_amount }}</td>
+          <td>{{ contribution.category }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

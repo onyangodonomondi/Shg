@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}  <!-- Ensure this is loaded before using the static tag -->
+
+{% block title %}Welcome to NYAGWA SHG{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero text-center text-white d-flex justify-content-center align-items-center" style="background-image: url('{% static 'images/hero-bg.jpg' %}'); height: 500px; background-size: cover;">
+    <div>
+        <h1 class="display-4">Welcome to NYAGWA SHG</h1>
+        <p class="lead">Empowering our community through collective support.</p>
+        <a href="#" class="btn btn-primary btn-lg mt-3" style="background: linear-gradient(90deg, #1CB5E0 0%, #000851 100%); border: none;">Join Us Now</a>
+    </div>
+</section>
+
+<!-- Call-to-Action Section -->
+<section class="cta py-5 text-center bg-light">
+    <div class="container">
+        <h2>Get Involved Today!</h2>
+        <p class="lead">Explore our events and start contributing to our community-driven initiatives.</p>
+        <a href="{% url 'events_page' %}" class="btn btn-outline-primary btn-lg">Explore Events</a>
+        <a href="{% url 'contributions_page' %}" class="btn btn-outline-success btn-lg">Make a Contribution</a>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="services py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm" style="background-color: #f8f9fa; border-radius: 10px;">
+                    <div class="card-body">
+                        <img src="{% static 'images/community-support-icon.png' %}" alt="Community Support" class="mb-3" style="width: 60px;">
+                        <h3 class="card-title">Community Support</h3>
+                        <p class="card-text">Join a group of like-minded individuals supporting each other.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm" style="background-color: #f8f9fa; border-radius: 10px;">
+                    <div class="card-body">
+                        <img src="{% static 'images/financial-aid-icon.png' %}" alt="Financial Aid" class="mb-3" style="width: 60px;">
+                        <h3 class="card-title">Financial Aid</h3>
+                        <p class="card-text">Contribute and receive financial assistance during tough times.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm" style="background-color: #f8f9fa; border-radius: 10px;">
+                    <div class="card-body">
+                        <img src="{% static 'images/events-icon.png' %}" alt="Events & Activities" class="mb-3" style="width: 60px;">
+                        <h3 class="card-title">Events & Activities</h3>
+                        <p class="card-text">Participate in community events that bring us closer together.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+{% endblock %}
