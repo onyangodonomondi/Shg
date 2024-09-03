@@ -1,0 +1,8 @@
+<form method="post">
+  {% csrf_token %} {{ form.as_p }} {% if form.has_children.value %} {% for i in
+  range form.number_of_children.value %}
+  <h4>Child {{ i + 1 }}</h4>
+  {{ child_form.as_p }} {% endfor %} {% endif %}
+
+  <button type="submit">Register Member</button>
+</form>

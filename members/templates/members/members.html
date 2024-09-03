@@ -1,0 +1,16 @@
+<h2>Members</h2>
+<ul>
+  {% for member in members %}
+  <li>{{ member.first_name }} {{ member.last_name }}</li>
+  {% endfor %}
+</ul>
+
+<h2>Child Members</h2>
+<ul>
+  {% for child in child_members %}
+  <li>
+    {{ child.name }} (Child of {{ child.member.first_name }} {{
+    child.member.last_name }})
+  </li>
+  {% endfor %}
+</ul>

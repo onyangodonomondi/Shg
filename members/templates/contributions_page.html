@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Contributions{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-4">Contributions</h1>
+
+<div class="container mb-4">
+    <form method="get">
+        <div class="row">
+            <div class="col-md-4">
+                <select name="event" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Events</option>
+                    {% for event in events %}
+                    <option value="{{ event.name }}" {% if event.name == selected_event %}selected{% endif %}>
+                        {{ event.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="{% url 'export_contributions_pdf' %}?event={{ selected_event }}" class="btn btn-danger">Export to PDF</a>
+                <a href="{% url 'export_contributions_excel' %}?event={{ selected_event }}" class="btn btn-success">Export to Excel</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Member Name</th>
+                <th scope="col">Event</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contribution in contributions %}
+            <tr>
+                <td>{{ contribution.profile.surname }} {{ contribution.profile.othernames }}</td>
+                <td>{{ contribution.event.name }}</td>
+                <td>{{ contribution.amount }} Ksh</td>
+                <td>{{ contribution.category }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No contributions found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
