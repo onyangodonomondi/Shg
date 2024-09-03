@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, FileResponse
-from .forms import UserUpdateForm, ProfileUpdateForm, UserSignUpForm
+from .forms import UserUpdateForm, ProfileUpdateForm, UserSignUpForm, EventForm, ContributionForm
 from .models import Profile, Event, Contribution, Notification
 from django.db.models import Sum, Count
 from django.contrib.auth.views import PasswordResetView, LoginView
@@ -19,29 +19,31 @@ from datetime import datetime
 def home(request):
     return render(request, 'members/home.html')
 
-@login_required
-def profile(request):
-    user = request.user
-    contributions = Contribution.objects.filter(profile=user.profile)
-    
-    # Calculate total contributions
-    total_contributed = contributions.aggregate(Sum('amount'))['amount__sum'] or 0
-    
-    # Determine time of day for greeting
-    current_hour = datetime.now().hour
-    if current_hour < 12:
-        greeting_time = 'morning'
-    elif 12 <= current_hour < 18:
-        greeting_time = 'afternoon'
+@user_passes_test(lambda u: u.is_staff)
+def manage_contributions(request):
+    if request.method == 'POST':
+        form = ContributionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('contributions_page')
     else:
-        greeting_time = 'evening'
+        form = ContributionForm()
+
+    contributions = Contribution.objects.all()
+    return render(request, 'members/manage_contributions.html', {'form': form, 'contributions': contributions})
+
+@user_passes_test(lambda u: u.is_staff)
+def manage_events(request):
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('events_page')
+    else:
+        form = EventForm()
     
-    context = {
-        'user_contributions': contributions,
-        'total_contributed': total_contributed,
-        'greeting_time': greeting_time,
-    }
-    return render(request, 'profile.html', context)
+    events = Event.objects.all()
+    return render(request, 'members/manage_events.html', {'form': form, 'events': events})
 
 @login_required
 def profile(request):
@@ -77,7 +79,7 @@ def update_profile(request):
         form = ProfileUpdateForm(request.POST, instance=request.user.profile)
         if form.is_valid():
             form.save()
-            return redirect('profile', user_id=request.user.id)
+            return redirect('profile')  # Adjust this if you need to redirect to a different profile view
     else:
         form = ProfileUpdateForm(instance=request.user.profile)
     

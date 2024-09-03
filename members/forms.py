@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Profile
+from .models import Profile, Contribution, Event
 
 class UserSignUpForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -11,14 +11,14 @@ class UserSignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name','phone_number', 'password1', 'password2']
+        fields = ['username', 'email', 'first_name', 'last_name', 'phone_number', 'password1', 'password2']
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
-        user.phone_number=self.cleaned_data['phone_number']
+        user.phone_number = self.cleaned_data['phone_number']
         if commit:
             user.save()
         return user
@@ -44,3 +44,13 @@ class ProfileUpdateForm(forms.ModelForm):
             'website': forms.URLInput(attrs={'class': 'form-control'}),
             'social_links': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['name', 'date', 'required_amount', 'is_active']
+
+class ContributionForm(forms.ModelForm):
+    class Meta:
+        model = Contribution
+        fields = ['profile', 'event', 'amount']  # 'category' removed as it's a computed property

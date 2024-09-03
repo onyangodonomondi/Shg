@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Manage Events</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Add Event</button>
+</form>
+
+<h3>Existing Events</h3>
+<ul>
+    {% for event in events %}
+    <li>{{ event.name }} - {{ event.date }} - {{ event.required_amount }} - {% if event.is_active %}Active{% else %}Inactive{% endif %}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

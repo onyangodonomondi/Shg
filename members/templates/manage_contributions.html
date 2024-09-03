@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Manage Contributions</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Add Contribution</button>
+</form>
+
+<h3>Existing Contributions</h3>
+<ul>
+    {% for contribution in contributions %}
+    <li>{{ contribution.profile.surname }} {{ contribution.profile.othernames }} - {{ contribution.event.name }} - {{ contribution.amount }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

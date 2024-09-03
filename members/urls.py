@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import CustomPasswordResetView, CustomLoginView
+from .views import CustomPasswordResetView, CustomLoginView, manage_events, manage_contributions  # Import the views here
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -11,6 +11,10 @@ urlpatterns = [
     path('profile/update/', views.update_profile, name='update_profile'),
     path('profile/<int:user_id>/', views.profile, name='profile'),
     path('profile/update/', views.update_profile, name='update_profile'),
+
+    # Manage URLs
+    path('manage/events/', manage_events, name='manage_events'),
+    path('manage/contributions/', manage_contributions, name='manage_contributions'),
 
     # Members and Contributions URLs
     path('members/', views.members_page, name='members'),
