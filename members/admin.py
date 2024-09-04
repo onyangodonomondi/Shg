@@ -9,7 +9,7 @@ class ProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Profile Details'
     fk_name = 'user'
-    fields = ('surname', 'othernames', 'email', 'phone_number', 'birthdate', 'has_children', 'number_of_children', 'image')
+    fields = ('othernames', 'email', 'phone_number', 'birthdate', 'has_children', 'number_of_children', 'image')
 
 # Customized User admin
 class UserAdmin(BaseUserAdmin):
@@ -50,17 +50,18 @@ class EventAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.order_by('date')
+
 # Admin customization for Contribution
 @admin.register(Contribution)
 class ContributionAdmin(admin.ModelAdmin):
     list_display = ('get_profile_name', 'event', 'amount', 'category')
-    search_fields = ('profile__surname', 'profile__othernames', 'event__name')
-    list_filter = ('event', 'profile__surname', 'profile__othernames')
-    ordering = ('event', 'profile__surname')
+    search_fields = ('profile__user__first_name', 'profile__user__last_name', 'event__name')  # Fixed to use first_name and last_name
+    list_filter = ('event', 'profile__user__first_name', 'profile__user__last_name')  # Adjusted list filter
+    ordering = ('event', 'profile__user__last_name')
     readonly_fields = ('category',)
 
     def get_profile_name(self, obj):
-        return f"{obj.profile.surname} {obj.profile.othernames}"
+        return f"{obj.profile.user.first_name} {obj.profile.user.last_name}"
     get_profile_name.short_description = 'Profile Name'
 
 # Customizing the admin site titles

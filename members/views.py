@@ -56,23 +56,25 @@ def profile(request):
     # Determine time of day for greeting
     current_hour = datetime.now().hour
     if current_hour < 12:
-        greeting_time = 'morning'
+        greeting_time = 'Good morning'
     elif 12 <= current_hour < 18:
-        greeting_time = 'afternoon'
+        greeting_time = 'Good afternoon'
     else:
-        greeting_time = 'evening'
+        greeting_time = 'Good evening'
     
-    # Fetch the most recent events user has contributed to
-    recent_contributions = contributions.order_by('-event__date')[:5]
-    
+    # Check if today is the user's birthday
+    today = datetime.today().date()
+    if user.profile.birthdate and user.profile.birthdate == today:
+        greeting_message = f"Happy Birthday, {user.first_name}!"
+    else:
+        greeting_message = f"{greeting_time}, {user.first_name}!"
+
     context = {
         'user_contributions': contributions,
         'total_contributed': total_contributed,
-        'greeting_time': greeting_time,
-        'recent_contributions': recent_contributions,
+        'greeting_message': greeting_message,
     }
-    return render(request, 'members/profile.html', context)
-
+    return render(request, 'profile.html', context)
 @login_required
 def update_profile(request):
     if request.method == 'POST':

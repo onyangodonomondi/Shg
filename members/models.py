@@ -12,9 +12,6 @@ class Profile(models.Model):
     birthdate = models.DateField(null=True, blank=True)
     phone_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField(blank=True)
-    website = models.URLField(blank=True)  # New field for website
-    social_links = models.JSONField(default=dict, blank=True)  # New field for social links
-    surname = models.CharField(max_length=100)
     othernames = models.CharField(max_length=100)
     has_children = models.BooleanField(default=False)
     number_of_children = models.PositiveIntegerField(null=True, blank=True)
