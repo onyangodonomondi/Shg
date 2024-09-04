@@ -1,74 +1,86 @@
 {% extends 'base.html' %}
-{% load widget_tweaks %}
+{% load static %}
+
+{% block title %}Update Profile{% endblock %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center align-items-center">
-    <div class="card p-4" style="max-width: 600px; width: 100%;">
-        <h3 class="text-center mb-4">Update Profile</h3>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4 shadow-lg" style="border-radius: 15px;">
+                <h2 class="text-center mb-4">Update Profile</h2>
 
-            <div class="text-center mb-3">
-                <label for="id_image">Profile Picture:</label><br>
-                <img src="{{ user.profile.image.url }}" alt="Profile Image" class="img-thumbnail mb-2" width="150" height="150">
-                {{ form.image|add_class:"form-control-file" }}
-            </div>
+                <!-- Profile Image Section -->
+                <div class="text-center mb-4">
+                    {% if user.profile.image %}
+                    <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                    {% else %}
+                    <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                    {% endif %}
+                    <p class="text-muted">Currently: <a href="{{ user.profile.image.url }}" target="_blank">{{ user.profile.image.name }}</a></p>
+                    <label class="btn btn-outline-primary">
+                        Change: <input type="file" style="display: none;" name="profile_image">
+                    </label>
+                </div>
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="id_bio">Bio:</label>
-                    {{ form.bio|add_class:"form-control" }}
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="id_location">Location:</label>
-                    {{ form.location|add_class:"form-control" }}
-                </div>
-            </div>
+                <!-- Profile Update Form -->
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
 
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="id_birthdate">Birthdate:</label>
-                    {{ form.birthdate|add_class:"form-control" }}
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="id_phone_number">Phone Number:</label>
-                    {{ form.phone_number|add_class:"form-control" }}
-                </div>
-            </div>
+                    <!-- Bio Section -->
+                    <div class="form-group mb-3">
+                        <label for="bio">Bio:</label>
+                        <textarea id="bio" name="bio" class="form-control" placeholder="Write something about yourself...">{{ user.profile.bio }}</textarea>
+                    </div>
 
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary w-100">Update Profile</button>
+                    <!-- Location Section -->
+                    <div class="form-group mb-3">
+                        <label for="location">Location:</label>
+                        <input id="location" type="text" name="location" class="form-control" placeholder="Enter your location" value="{{ user.profile.location }}">
+                    </div>
+
+                    <!-- Birthdate Section -->
+                    <div class="form-group mb-3">
+                        <label for="birthdate">Birthdate:</label>
+                        <input id="birthdate" type="date" name="birthdate" class="form-control" value="{{ user.profile.birthdate }}">
+                    </div>
+
+                    <!-- Phone Number Section -->
+                    <div class="form-group mb-3">
+                        <label for="phone_number">Phone Number:</label>
+                        <input id="phone_number" type="text" name="phone_number" class="form-control" placeholder="Enter your phone number" value="{{ user.profile.phone_number }}">
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-block" style="padding: 10px 30px; font-size: 1.2rem; border-radius: 10px;">Update Profile</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
+<!-- Custom CSS -->
 <style>
-    .form-control {
-        border-radius: 25px;
-        padding: 10px;
-    }
-
-    .btn-primary {
-        border-radius: 25px;
-        padding: 10px;
-        background-color: #007bff;
-        border: none;
-        width: 100%;
-    }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
     .card {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 10px;
+        border: none;
+        border-radius: 15px;
+        padding: 2rem;
     }
-
-    .text-center {
-        font-weight: 600;
+    .form-control {
+        border-radius: 10px;
+        padding: 10px;
+    }
+    textarea.form-control {
+        height: 120px;
+    }
+    label {
+        font-weight: bold;
+        color: #343a40;
+    }
+    input[type="file"] {
+        display: none;
     }
 </style>
 {% endblock %}

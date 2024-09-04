@@ -8,12 +8,12 @@
     <div class="row">
         <!-- Profile Image and Greeting Message -->
         <div class="col-md-4">
-            <div class="card text-center p-3">
+            <div class="card text-center profile-card p-3">
                 <!-- Profile Picture -->
                 {% if user.profile.image %}
-                <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px;">
+                <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
                 {% else %}
-                <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px;">
+                <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
                 {% endif %}
                 
                 <!-- Center-aligned Name and Greeting -->
@@ -46,6 +46,7 @@
                         <ul class="list-unstyled">
                             <li><strong>Email:</strong> {{ user.email }}</li>
                             <li><strong>Phone:</strong> {{ user.profile.phone_number|default:"Not provided" }}</li>
+                            <li><strong>Birthday:</strong> {{ user.profile.birthdate|date:"d M, Y" }}</li> <!-- Birthday field added here -->
                         </ul>
                     </div>
 
@@ -55,10 +56,13 @@
                         {% if user_contributions %}
                         <ul class="list-group mt-3 contributions-list">
                             {% for contribution in user_contributions %}
-                            <li class="list-group-item">
+                            <li class="list-group-item contribution-item">
                                 <strong>Event:</strong> {{ contribution.event.name }}<br>
                                 <strong>Amount:</strong> {{ contribution.amount }} Ksh<br>
-                                <strong>Status:</strong> {{ contribution.category }}
+                                <strong>Status:</strong> 
+                                <span class="badge {% if contribution.category == 'Fully Contributed' %} bg-success {% else %} bg-warning {% endif %}">
+                                    {{ contribution.category }}
+                                </span>
                             </li>
                             {% endfor %}
                         </ul>
@@ -70,9 +74,9 @@
                         
                         <h3>Event Contribution Statistics</h3>
                         <p>Total Members: {{ total_members }}</p>
-                        <ul class="list-group">
+                        <ul class="list-group event-contribution-list" style="max-height: 150px; overflow-y: auto;">
                             {% for event in event_contributors %}
-                            <li class="list-group-item">
+                            <li class="list-group-item contribution-item">
                                 <strong>Event:</strong> {{ event.event.name }}<br>
                                 <strong>Contributors:</strong> {{ event.contributors_count }} contributors
                             </li>
@@ -85,11 +89,61 @@
     </div>
 </div>
 
-<!-- CSS for scrollable contributions list -->
+<!-- CSS for scrollable contributions list and profile card -->
 <style>
     .contributions-list {
         max-height: 200px;
         overflow-y: auto;
+    }
+
+    /* Profile Card Styling */
+    .profile-card {
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        max-width: 300px;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-image {
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid #007bff;
+    }
+
+    /* Contribution items with color variance */
+    .contribution-item {
+        background-color: #f8f9fa;
+        margin-bottom: 10px;
+        border-left: 5px solid #007bff;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .contribution-item:nth-child(odd) {
+        background-color: #e9ecef;
+        border-left: 5px solid #28a745;
+    }
+
+    .badge.bg-success {
+        background-color: #28a745;
+        padding: 5px 10px;
+    }
+
+    .badge.bg-warning {
+        background-color: #ffc107;
+        padding: 5px 10px;
     }
 </style>
 {% endblock %}
