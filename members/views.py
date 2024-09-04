@@ -52,7 +52,7 @@ def profile(request):
     user = request.user
     contributions = Contribution.objects.filter(profile=user.profile)
 
-    # Calculate total contributions made by the user
+    # Calculate total contributions
     total_contributed = contributions.aggregate(Sum('amount'))['amount__sum'] or 0
 
     # Determine time of day for greeting
@@ -71,30 +71,28 @@ def profile(request):
     else:
         greeting_message = f"{greeting_time}, {user.first_name}!"
 
-    # Total number of users (Profiles)
-    total_members = Profile.objects.count()
+    # Total number of users
+    total_users = Profile.objects.count()
 
-    # Event contribution statistics: calculate total contributions and contributors for each event
+    # Event contribution statistics
+    event_contribution_stats = []
     events = Event.objects.all()
-    event_contributors = []
     for event in events:
         total_contributions = Contribution.objects.filter(event=event).aggregate(Sum('amount'))['amount__sum'] or 0
         contributors_count = Contribution.objects.filter(event=event).aggregate(Count('profile', distinct=True))['profile__count'] or 0
-        
-        event_contributors.append({
-            'event': event,
+        event_contribution_stats.append({
+            'event_name': event.name,
             'total_contributed': total_contributions,
-            'contributors_count': contributors_count
+            'contributors_count': contributors_count,
+            'total_users': total_users
         })
 
     context = {
         'user_contributions': contributions,
         'total_contributed': total_contributed,
         'greeting_message': greeting_message,
-        'total_members': total_members,
-        'event_contributors': event_contributors,  # Pass the event contribution data to the template
+        'event_contribution_stats': event_contribution_stats,
     }
-
     return render(request, 'profile.html', context)
 
 @login_required
@@ -110,23 +108,13 @@ def update_profile(request):
     return render(request, 'members/update_profile.html', {'form': form})
 
 def events_page(request):
-    events = Event.objects.filter(is_active=True)  # Only show active events
+    # Fetch all active events
+    events = Event.objects.filter(is_active=True)
     total_members = Profile.objects.count()  # Get total number of members
-
-    # Apply filters based on request.GET parameters
-    date_filter = request.GET.get('date')
-    min_amount = request.GET.get('min_amount')
-    max_amount = request.GET.get('max_amount')
-
-    if date_filter:
-        events = events.filter(date=date_filter)
-    if min_amount:
-        events = events.filter(contributions__amount__gte=min_amount)
-    if max_amount:
-        events = events.filter(contributions__amount__lte=max_amount)
 
     event_data = []
 
+    # Prepare the event data
     for event in events:
         total_contributed = Contribution.objects.filter(event=event).aggregate(Sum('amount'))['amount__sum'] or 0
         percentage_contributed = (total_contributed / event.required_amount) * 100 if event.required_amount > 0 else 0
@@ -140,6 +128,7 @@ def events_page(request):
             'total_members': total_members,  # Include total members in the data
         })
 
+    # Render the page without any filters
     context = {
         'event_data': event_data,
     }

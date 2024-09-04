@@ -3,6 +3,7 @@ from . import views
 from .views import CustomPasswordResetView, CustomLoginView, manage_events, manage_contributions  # Import the views here
 from django.contrib.auth import views as auth_views
 
+
 urlpatterns = [
     path('', views.home, name='home'), 
     path('events/', views.events_page, name='events_page'),

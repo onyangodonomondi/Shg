@@ -15,9 +15,9 @@ load_dotenv(dotenv_path=BASE_DIR / '.secure')
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ["*"]  # Update this for production
+ALLOWED_HOSTS = ["nyagwa.co.ke", "www.nyagwa.co.ke", "172.233.249.179", "localhost"]
 
 # Application definition
 
@@ -71,8 +71,12 @@ WSGI_APPLICATION = 'textutils.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),  # Default PostgreSQL port
     }
 }
 
@@ -110,6 +114,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Add this line
 
 # Media files (for handling uploaded images like profile pictures)
 MEDIA_URL = '/media/'
@@ -126,3 +131,35 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # Crispy Forms
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# Security Settings
+SECURE_SSL_REDIRECT = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+X_FRAME_OPTIONS = 'DENY'
+
+# Logging (Optional)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs/django.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}

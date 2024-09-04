@@ -16,20 +16,27 @@
 }
 
 .navbar-nav .nav-link {
-    color: #fff;
+    color: #fff !important;
     font-size: 1rem;
     padding-left: 20px;
     padding-right: 20px;
+    text-transform: uppercase;
+    font-weight: 500;
 }
 
 .navbar-nav .nav-link:hover {
-    color: #f0a500;
+    color: #1CB5E0 !important;
     /* Change color on hover */
 }
 
 .navbar-toggler-icon {
     filter: invert(1);
     /* Make toggler icon white */
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.1);
+    /* For the hamburger menu icon */
 }
 
 /* Hero Section */
@@ -112,6 +119,18 @@
     /* Center align text inside the cards */
 }
 
+/* Services Section */
+.services .card img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 15px;
+    object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    /* Center align the image */
+}
+
 /* General Container and Heading Styles */
 .container {
     max-width: 1200px;
@@ -156,77 +175,36 @@ h1 {
     }
 }
 
-/* Responsive Table Styling */
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+/* Profiles Section Scroll */
+.profiles-container {
+    max-height: 600px;
+    /* Limits the height and adds scroll */
+    overflow-y: auto;
+    /* Enables scrolling */
 }
 
-.table th,
-.table td {
-    vertical-align: middle;
-    text-align: left;
-    white-space: nowrap;
-    padding: 15px;
+.profiles-container .row {
+    display: flex;
+    flex-wrap: wrap;
 }
 
-.table thead th {
-    background-color: #343a40;
-    color: white;
-    text-transform: uppercase;
+.profiles-container .card {
+    height: 100%;
 }
 
-.table-striped tbody tr:nth-of-type(odd) {
-    background-color: #f2f2f2;
+/* Card hover effect */
+.card {
+    transition: all 0.3s ease-in-out;
 }
 
-.table tbody tr:hover {
-    background-color: #f1f1f1;
+.card:hover {
+    transform: translateY(-5px);
 }
 
-/* Custom Responsive Design for Small Screens */
+/* Mobile view adjustments */
 @media (max-width: 576px) {
-    .table thead {
-        display: none;
-    }
-
-    .table tr {
-        display: block;
-        margin-bottom: 10px;
-        border: 1px solid #ddd;
-        /* Add border for clarity */
-        border-radius: 10px;
-        padding: 10px;
-    }
-
-    .table td {
-        display: block;
-        text-align: left;
-        font-size: 14px;
-        border-bottom: 1px solid #ddd;
-        position: relative;
-        padding-left: 15px;
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-
-    .table td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 0;
-        width: 50%;
-        font-weight: bold;
-        text-align: left;
-        background-color: #f8f9fa;
-    }
-
-    .table td:last-child {
-        border-bottom: none;
-    }
-
-    .badge {
-        display: block;
-        margin: 10px 0;
+    .profiles-container {
+        max-height: 400px;
     }
 }
 
@@ -259,341 +237,247 @@ html {
     color: #6c757d;
 }
 
-/* Features Section */
-.features-section {
-    padding: 60px 0;
-    margin-top: 30px;
-}
-
-.features-section .feature-box i {
-    color: #17a2b8;
-    margin-bottom: 15px;
-}
-
-.features-section .feature-box h4 {
-    font-size: 1.75rem;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.features-section .feature-box p {
-    font-size: 1.1rem;
-    color: #6c757d;
-    text-align: center;
-}
-
-/* Stats Section */
-.stats-section {
-    background-color: #f8f9fa;
-    padding: 60px 0;
-}
-
-.stat-box h2 {
-    font-size: 3rem;
-    font-weight: bold;
-    text-align: center;
-}
-
-.stat-box p {
-    font-size: 1.2rem;
-    margin-top: 10px;
-    text-align: center;
-}
-
-.form-inline {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.form-control {
-    width: auto;
-    display: inline-block;
-}
-
-.card-header {
-    background-color: #000;
-    color: #fff;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #004085;
-}
-
-.form-floating {
-    margin-bottom: 1rem;
-}
-
-.form-control {
-    height: auto;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: 0.25rem;
-}
-
-.form-control-lg {
-    font-size: 1.25rem;
-    /* Increase the font size */
-    padding: 0.875rem 1.25rem;
-    /* Increase padding */
-}
-
-.btn-block {
-    padding: 10px 20px;
-    font-size: 1.25rem;
-    border-radius: 5px;
-}
-
-.d-grid {
-    display: flex;
-    justify-content: center;
-}
-
-/* custom.css */
-.card {
+/* Contributions List Styling */
+.contributions-list {
+    max-height: 200px;
+    /* Set your desired max height */
+    overflow-y: auto;
+    /* Enable vertical scroll */
+    padding: 10px 15px;
     border-radius: 10px;
 }
 
-.card-header {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
-
-img.rounded-circle {
-    border: 2px solid #ddd;
-    padding: 3px;
-    background: white;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+.contributions-list .list-group-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
     transition: background-color 0.3s ease;
 }
 
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #004b9a;
+.contributions-list .list-group-item:nth-child(odd) {
+    background-color: #f1f1f1;
 }
 
-/* General styles */
-.table th,
-.table td {
-    vertical-align: middle;
+.contributions-list .list-group-item:hover {
+    background-color: #e9ecef;
 }
 
-/* Mobile view adjustments */
-@media (max-width: 768px) {
-    .table th {
-        font-weight: bold;
-        /* Make the table header bold */
-        font-size: 1rem;
-        /* Adjust font size for mobile */
-    }
-
-    .table td {
-        font-size: 0.9rem;
-        /* Adjust font size for mobile */
-    }
-
-    .table td::before {
-        content: attr(data-label);
-        /* Display the label in front of the content */
-        font-weight: bold;
-        /* Make the label bold */
-        display: block;
-    }
-
-    .table th,
-    .table td {
-        display: block;
-        width: 100%;
-        text-align: left;
-    }
-
-    .table thead {
-        display: none;
-        /* Hide table headers */
-    }
-
-    .table tbody tr {
-        display: block;
-        margin-bottom: 1rem;
-    }
-}
-
-/* Mobile view adjustments */
-@media (max-width: 768px) {
-
-    .table th,
-    .table td {
-        display: block;
-        width: 100%;
-        text-align: left;
-        border-top: none;
-        /* Remove top borders to avoid double borders */
-    }
-
-    .table td::before {
-        content: attr(data-label);
-        /* Display the label in front of the content */
-        font-weight: bold;
-        /* Make the label bold */
-        display: block;
-        margin-bottom: 0.5rem;
-    }
-
-    .table td {
-        padding-left: 50%;
-        /* Offset the value to the right */
-        position: relative;
-    }
-
-    .table td::before {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 45%;
-        /* Allow enough space for the label */
-        padding: 0.75rem 0.75rem 0.75rem 1rem;
-        white-space: nowrap;
-    }
-
-    .table thead {
-        display: none;
-        /* Hide table headers */
-    }
-
-    .table tbody tr {
-        display: block;
-        margin-bottom: 1rem;
-        border: 1px solid #dee2e6;
-        /* Add a border around each item */
-    }
-
-    .table tbody tr td {
-        border-top: none;
-        /* Remove top borders from td to avoid double borders */
-    }
-}
-
-.card img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #ddd;
-    /* Optional: Adds a border around the image */
-}
-
-.card {
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary {
-    margin-top: 20px;
-}
-
-.nav-tabs .nav-link.active {
-    background-color: #007bff;
-    color: white;
-}
-
-.tab-content {
-    padding-top: 20px;
-}
-
-.list-unstyled li {
-    padding: 5px 0;
-}
-
-.profile-card {
-    background-color: #f8f9fa;
-    /* Light gray background */
-    border-radius: 10px;
-    /* Rounded corners */
-    padding: 20px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    /* Subtle shadow */
-}
-
-.contribution-status {
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 5px;
-    display: inline-block;
-}
-
-.status-fully {
-    background-color: #28a745;
-    color: white;
-}
-
-.status-partially {
-    background-color: #ffc107;
-    color: white;
-}
-
-
-.profile-card h2 {
-    font-size: 1.5rem;
-    margin-top: 10px;
-}
-
-.profile-card .btn {
-    margin-top: auto;
-}
-
-.card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-.nav-tabs .nav-link.active {
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px 5px 0 0;
-}
-
-.nav-tabs .nav-link {
-    border: none;
+.contributions-list strong {
+    font-weight: 600;
     color: #007bff;
 }
 
-.nav-tabs .nav-link:hover {
+.total-contributed,
+.event-stats {
     background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-size: 1.2rem;
+    text-align: center;
 }
 
-h2 {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 24px;
-    font-weight: 600;
+.total-contributed {
+    background-color: #e3f2fd;
 }
 
-@media (max-width: 768px) {
-    .nav-tabs {
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-    }
+.event-stats {
+    background-color: #f1f8e9;
 }
 
-.card {
-    transition: all 0.3s ease-in-out;
+.total-contributed strong,
+.event-stats strong {
+    color: #343a40;
 }
 
-.card:hover {
+.total-contributed span,
+.event-stats span {
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* Total Contributed Section Styling */
+.total-contributed {
+    background-color: #e3f2fd;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    font-size: 1.2rem;
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+.total-contributed:hover {
     transform: translateY(-5px);
+}
+
+.total-contributed strong {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.total-contributed span {
+    font-weight: 600;
+    color: #343a40;
+}
+
+/* Event Stats Section Styling */
+.event-stats {
+    background-color: #f1f8e9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    font-size: 1.2rem;
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+.event-stats:hover {
+    transform: translateY(-5px);
+}
+
+.event-stats strong {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.event-stats span {
+    font-weight: 600;
+    color: #343a40;
+}
+
+/* Profile Card Styling */
+.profile-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    max-width: 300px;
+    /* Keeps the card responsive and centered */
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.profile-card img {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid #007bff;
+}
+
+.profile-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #343a40;
+}
+
+.profile-card .greeting {
+    color: #007bff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.profile-card .btn {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+}
+
+.profile-card .btn:hover {
+    background-color: #0056b3;
+    color: #ffffff;
+}
+
+.profile-card .btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* CSS for scrollable contributions list and profile card */
+.contributions-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Profile Card Styling */
+.profile-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    max-width: 300px;
+    /* Keeps the card responsive and centered */
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.profile-image {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid #007bff;
+}
+
+/* Contribution items with color variance */
+.contribution-item {
+    background-color: #f8f9fa;
+    margin-bottom: 10px;
+    border-left: 5px solid #007bff;
+}
+
+.contribution-item:nth-child(odd) {
+    background-color: #e9ecef;
+    border-left: 5px solid #28a745;
+}
+
+/* Badge styles */
+.badge.bg-success {
+    background-color: #28a745;
+    padding: 5px 10px;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107;
+    padding: 5px 10px;
+}
+
+/* Scrollable Event Contribution List */
+.event-contribution-list {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.event-contribution-list .contribution-item {
+    background-color: #f8f9fa;
+    margin-bottom: 10px;
+    border-left: 5px solid #007bff;
+}
+
+.event-contribution-list .contribution-item:nth-child(odd) {
+    background-color: #e9ecef;
+    border-left: 5px solid #28a745;
 }
