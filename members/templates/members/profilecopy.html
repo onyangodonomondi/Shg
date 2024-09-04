@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Profile Image and Greeting Message -->
+        <div class="col-md-4">
+            <div class="card text-center profile-card p-3">
+                <!-- Profile Picture -->
+                {% if user.profile.image %}
+                <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
+                {% else %}
+                <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
+                {% endif %}
+                
+                <!-- Center-aligned Name and Greeting -->
+                <h2 class="mt-3">{{ user.get_full_name }}</h2>
+                <h5 class="text-primary mt-2">{{ greeting_message }}</h5>
+                <a href="{% url 'update_profile' %}" class="btn btn-primary mt-2">Edit Profile</a>
+            </div>
+        </div>
+
+        <!-- User Info Section -->
+        <div class="col-md-8">
+            <div class="card p-4">
+                <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab" aria-controls="about" aria-selected="true">About</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button" role="tab" aria-controls="posts" aria-selected="false">Posts</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="contributions-tab" data-bs-toggle="tab" data-bs-target="#contributions" type="button" role="tab" aria-controls="contributions" aria-selected="false">Contributions</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="profileTabsContent">
+                    <div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="about-tab">
+                        <h3 class="mt-3">Bio</h3>
+                        <p>{{ user.profile.bio|default:"No bio available" }}</p>
+
+                        <h3 class="mt-4">Contact Information</h3>
+                        <ul class="list-unstyled">
+                            <li><strong>Email:</strong> {{ user.email }}</li>
+                            <li><strong>Phone:</strong> {{ user.profile.phone_number|default:"Not provided" }}</li>
+                            <li><strong>Birthday:</strong> {{ user.profile.birthdate|date:"d M, Y" }}</li> <!-- Birthday field added here -->
+                        </ul>
+                    </div>
+
+                    <!-- Contributions Tab -->
+                    <div class="tab-pane fade" id="contributions" role="tabpanel" aria-labelledby="contributions-tab">
+                        <h3 class="mt-3">Your Contributions</h3>
+                        {% if user_contributions %}
+                        <ul class="list-group mt-3 contributions-list">
+                            {% for contribution in user_contributions %}
+                            <li class="list-group-item contribution-item">
+                                <strong>Event:</strong> {{ contribution.event.name }}<br>
+                                <strong>Amount:</strong> {{ contribution.amount }} Ksh<br>
+                                <strong>Status:</strong> 
+                                <span class="badge {% if contribution.category == 'Fully Contributed' %} bg-success {% else %} bg-warning {% endif %}">
+                                    {{ contribution.category }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p class="mt-3">You have not made any contributions yet.</p>
+                        {% endif %}
+                        <h3>Total Amount Contributed</h3>
+                        <p>Total: {{ total_contributed }} Ksh</p>
+                        
+                        <h3>Event Contribution Statistics</h3>
+                        <p>Total Members: {{ total_members }}</p>
+                        <ul class="list-group event-contribution-list" style="max-height: 150px; overflow-y: auto;">
+                            {% for event in event_contributors %}
+                            <li class="list-group-item contribution-item">
+                                <strong>Event:</strong> {{ event.event.name }}<br>
+                                <strong>Contributors:</strong> {{ event.contributors_count }} contributors
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Admin Tools Section for Superusers -->
+                    {% if user.is_superuser %}
+                    <div class="mt-5">
+                        <h3>Admin Dashboard</h3>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <a href="{% url 'admin:index' %}">Go to Admin Dashboard</a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="{% url 'admin:auth_user_changelist' %}">Manage Users</a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="{% url 'admin:members_event_changelist' %}">Manage Events</a>
+                            </li>
+                            <li class="list-group-item">
+                                <a href="{% url 'admin:members_contribution_changelist' %}">Manage Contributions</a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS for scrollable contributions list and profile card -->
+<style>
+    .contributions-list {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    /* Profile Card Styling */
+    .profile-card {
+        background-color: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        max-width: 300px;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-image {
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid #007bff;
+    }
+
+    /* Contribution items with color variance */
+    .contribution-item {
+        background-color: #f8f9fa;
+        margin-bottom: 10px;
+        border-left: 5px solid #007bff;
+        padding: 10px;
+        border-radius: 10px;
+    }
+
+    .contribution-item:nth-child(odd) {
+        background-color: #e9ecef;
+        border-left: 5px solid #28a745;
+    }
+
+    .badge.bg-success {
+        background-color: #28a745;
+        padding: 5px 10px;
+    }
+
+    .badge.bg-warning {
+        background-color: #ffc107;
+        padding: 5px 10px;
+    }
+</style>
+{% endblock %}
