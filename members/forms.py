@@ -6,24 +6,24 @@ class UserSignUpForm(UserCreationForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=30, required=True)
     last_name = forms.CharField(max_length=30, required=True)
-    phone_number = forms.CharField(max_length=15, required=True)  # Still include phone_number here
+    phone_number = forms.CharField(max_length=15, required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']  # Removed phone_number from User model
+        fields = ['username', 'email', 'first_name', 'last_name', 'password1', 'password2']
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
+
         if commit:
             user.save()
-
-            # After saving the user, we save phone_number to the Profile model
+            # Save phone number to the profile after the user is created
             Profile.objects.create(
                 user=user,
-                phone_number=self.cleaned_data['phone_number'],  # Saving phone number to Profile
+                phone_number=self.cleaned_data['phone_number'],
             )
         return user
 class UserUpdateForm(forms.ModelForm):
@@ -38,15 +38,14 @@ class UserUpdateForm(forms.ModelForm):
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['image','bio', 'location', 'birthdate', 'phone_number']
+        fields = ['image', 'bio', 'location', 'birthdate', 'phone_number']
         widgets = {
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'location': forms.TextInput(attrs={'class': 'form-control'}),
             'birthdate': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
-            
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
         }
-
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event

@@ -597,3 +597,11 @@ h2 {
 .card:hover {
     transform: translateY(-5px);
 }
+
+/* Scrollable contributions list */
+.contributions-list {
+    max-height: 200px;
+    /* Set your desired max height */
+    overflow-y: auto;
+    /* Enable vertical scroll */
+}

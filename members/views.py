@@ -49,10 +49,10 @@ def manage_events(request):
 def profile(request):
     user = request.user
     contributions = Contribution.objects.filter(profile=user.profile)
-    
+
     # Calculate total contributions
     total_contributed = contributions.aggregate(Sum('amount'))['amount__sum'] or 0
-    
+
     # Determine time of day for greeting
     current_hour = datetime.now().hour
     if current_hour < 12:
@@ -61,7 +61,7 @@ def profile(request):
         greeting_time = 'Good afternoon'
     else:
         greeting_time = 'Good evening'
-    
+
     # Check if today is the user's birthday
     today = datetime.today().date()
     if user.profile.birthdate and user.profile.birthdate == today:
@@ -69,19 +69,37 @@ def profile(request):
     else:
         greeting_message = f"{greeting_time}, {user.first_name}!"
 
+    # Total number of users
+    total_users = Profile.objects.count()
+
+    # Event contribution statistics
+    event_contribution_stats = []
+    events = Event.objects.all()
+    for event in events:
+        total_contributions = Contribution.objects.filter(event=event).aggregate(Sum('amount'))['amount__sum'] or 0
+        contributors_count = Contribution.objects.filter(event=event).aggregate(Count('profile', distinct=True))['profile__count'] or 0
+        event_contribution_stats.append({
+            'event_name': event.name,
+            'total_contributed': total_contributions,
+            'contributors_count': contributors_count,
+            'total_users': total_users
+        })
+
     context = {
         'user_contributions': contributions,
         'total_contributed': total_contributed,
         'greeting_message': greeting_message,
+        'event_contribution_stats': event_contribution_stats,
     }
     return render(request, 'profile.html', context)
+
 @login_required
 def update_profile(request):
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, instance=request.user.profile)
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()
-            return redirect('profile')  # Adjust this if you need to redirect to a different profile view
+            return redirect('profile')
     else:
         form = ProfileUpdateForm(instance=request.user.profile)
     
@@ -149,6 +167,7 @@ def signup(request):
             return redirect('home')
     else:
         form = UserSignUpForm()
+    
     return render(request, 'registration/signup.html', {'form': form})
 
 class CustomPasswordResetView(PasswordResetView):
@@ -177,20 +196,27 @@ def export_contributions_pdf(request):
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     elements = []
 
+    # Title
     title_style = getSampleStyleSheet()['Heading1']
-    title_style.alignment = 1  # Center the title
+    title_style.alignment = 1  # Center align the title
     title = Paragraph("Contributions Report", title_style)
     elements.append(title)
     elements.append(Spacer(1, 0.5 * inch))
 
-    data = [["Profile Name", "Event", "Amount", "Status"]]
+    # Table data
+    data = [["Member Name", "Event", "Amount", "Status"]]
+    
+    # Access user names via the User model associated with Profile
     for contribution in contributions:
-        profile_name = f"{contribution.profile.surname} {contribution.profile.othernames}"
+        profile = contribution.profile
+        user = profile.user
+        profile_name = f"{user.first_name} {user.last_name}"  # Fetch full name from User model
         event_name = contribution.event.name
         amount = f"{contribution.amount} Ksh"
         status = contribution.category
         data.append([profile_name, event_name, amount, status])
 
+    # Create the table
     table = Table(data, colWidths=[2 * inch, 2 * inch, 1.5 * inch, 1.5 * inch])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.darkgrey),
@@ -209,7 +235,6 @@ def export_contributions_pdf(request):
 
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename='contributions.pdf')
-
 def export_contributions_excel(request):
     selected_event = request.GET.get('event')
     if selected_event and selected_event != 'None':
@@ -224,17 +249,26 @@ def export_contributions_excel(request):
     workbook = xlsxwriter.Workbook(output, {'in_memory': True})
     worksheet = workbook.add_worksheet()
 
+    # Add headers
     header_format = workbook.add_format({'bold': True, 'text_wrap': True, 'valign': 'top', 'fg_color': '#D7E4BC', 'border': 1})
-    worksheet.write(0, 0, 'Profile Name', header_format)
+    worksheet.write(0, 0, 'Member Name', header_format)
     worksheet.write(0, 1, 'Event', header_format)
     worksheet.write(0, 2, 'Amount', header_format)
     worksheet.write(0, 3, 'Status', header_format)
 
+    # Populate rows with contributions
     for row_num, contribution in enumerate(contributions, 1):
-        worksheet.write(row_num, 0, f"{contribution.profile.surname} {contribution.profile.othernames}")
-        worksheet.write(row_num, 1, contribution.event.name)
-        worksheet.write(row_num, 2, f"{contribution.amount} Ksh")
-        worksheet.write(row_num, 3, contribution.category)
+        profile = contribution.profile
+        user = profile.user  # Access the related User model
+        profile_name = f"{user.first_name} {user.last_name}"  # Fetch full name from User model
+        event_name = contribution.event.name
+        amount = f"{contribution.amount} Ksh"
+        status = contribution.category
+
+        worksheet.write(row_num, 0, profile_name)
+        worksheet.write(row_num, 1, event_name)
+        worksheet.write(row_num, 2, amount)
+        worksheet.write(row_num, 3, status)
 
     workbook.close()
 
