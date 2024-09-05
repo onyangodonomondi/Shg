@@ -52,7 +52,7 @@ def profile(request):
     user = request.user
     contributions = Contribution.objects.filter(profile=user.profile)
 
-    # Calculate total contributions
+    # Calculate total contributions made by the user
     total_contributed = contributions.aggregate(Sum('amount'))['amount__sum'] or 0
 
     # Determine time of day for greeting
@@ -71,28 +71,30 @@ def profile(request):
     else:
         greeting_message = f"{greeting_time}, {user.first_name}!"
 
-    # Total number of users
-    total_users = Profile.objects.count()
+    # Total number of users (Profiles)
+    total_members = Profile.objects.count()
 
-    # Event contribution statistics
-    event_contribution_stats = []
+    # Event contribution statistics: calculate total contributions and contributors for each event
     events = Event.objects.all()
+    event_contributors = []
     for event in events:
         total_contributions = Contribution.objects.filter(event=event).aggregate(Sum('amount'))['amount__sum'] or 0
         contributors_count = Contribution.objects.filter(event=event).aggregate(Count('profile', distinct=True))['profile__count'] or 0
-        event_contribution_stats.append({
-            'event_name': event.name,
+        
+        event_contributors.append({
+            'event': event,
             'total_contributed': total_contributions,
-            'contributors_count': contributors_count,
-            'total_users': total_users  # Ensure total number of users is fetched and passed
+            'contributors_count': contributors_count
         })
 
     context = {
         'user_contributions': contributions,
         'total_contributed': total_contributed,
         'greeting_message': greeting_message,
-        'event_contribution_stats': event_contribution_stats,
+        'total_members': total_members,
+        'event_contributors': event_contributors,  # Pass the event contribution data to the template
     }
+
     return render(request, 'profile.html', context)
 @login_required
 def update_profile(request):
