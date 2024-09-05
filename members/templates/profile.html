@@ -83,27 +83,6 @@
                             {% endfor %}
                         </ul>
                     </div>
-
-                    <!-- Admin Tools Section for Superusers -->
-                    {% if user.is_superuser %}
-                    <div class="mt-5">
-                        <h3>Admin Dashboard</h3>
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <a href="{% url 'admin:index' %}">Go to Admin Dashboard</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="{% url 'admin:auth_user_changelist' %}">Manage Users</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="{% url 'admin:members_event_changelist' %}">Manage Events</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="{% url 'admin:members_contribution_changelist' %}">Manage Contributions</a>
-                            </li>
-                        </ul>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>

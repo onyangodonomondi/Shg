@@ -84,7 +84,7 @@ def profile(request):
             'event_name': event.name,
             'total_contributed': total_contributions,
             'contributors_count': contributors_count,
-            'total_users': total_users
+            'total_users': total_users  # Ensure total number of users is fetched and passed
         })
 
     context = {
@@ -94,7 +94,6 @@ def profile(request):
         'event_contribution_stats': event_contribution_stats,
     }
     return render(request, 'profile.html', context)
-
 @login_required
 def update_profile(request):
     if request.method == 'POST':
