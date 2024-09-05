@@ -43,7 +43,7 @@
             {% for contribution in contributions %}
             <tr>
                 <!-- Updated to fetch the full name from the User model -->
-                <td>{{ contribution.profile.user.get_full_name }}</td>
+                <td>{{ contribution.profile.user.get_full_name|default:contribution.profile.user.first_name }}</td>
                 <td>{{ contribution.event.name }}</td>
                 <td>{{ contribution.amount }} Ksh</td>
                 <td>{{ contribution.category }}</td>
