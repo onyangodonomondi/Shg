@@ -13,21 +13,48 @@
                 <!-- Profile Image Section -->
                 <div class="text-center mb-4">
                     {% if form.instance.image %}
-                        <img src="{{ form.instance.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
-                        <p class="text-muted">Currently: <a href="{{ form.instance.image.url }}" target="_blank">{{ form.instance.image.name }}</a></p>
+                    <img src="{{ form.instance.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
                     {% else %}
-                        <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
-                        <p class="text-muted">No image uploaded yet.</p>
+                    <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
                     {% endif %}
-                    <label class="btn btn-outline-primary">
-                        Change: {{ form.image }}
-                    </label>
+                    <p class="text-muted">Currently: <a href="{{ form.instance.image.url }}" target="_blank">{{ form.instance.image.name }}</a></p>
                 </div>
 
                 <!-- Profile Update Form -->
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    {{ form.as_p }} <!-- Automatically render the form fields -->
+                    <!-- Remove manually rendered image input field, rely on form rendering -->
+                    <div class="form-group mb-3">
+                        {{ form.image.label_tag }}: 
+                        {{ form.image }} <!-- Rendered automatically -->
+                    </div>
+
+                    {{ form.non_field_errors }}
+
+                    <!-- Automatically render the form fields for other profile details -->
+                    {{ form.bio.errors }}
+                    <div class="form-group mb-3">
+                        {{ form.bio.label_tag }} 
+                        {{ form.bio }}
+                    </div>
+
+                    {{ form.location.errors }}
+                    <div class="form-group mb-3">
+                        {{ form.location.label_tag }} 
+                        {{ form.location }}
+                    </div>
+
+                    {{ form.birthdate.errors }}
+                    <div class="form-group mb-3">
+                        {{ form.birthdate.label_tag }} 
+                        {{ form.birthdate }}
+                    </div>
+
+                    {{ form.phone_number.errors }}
+                    <div class="form-group mb-3">
+                        {{ form.phone_number.label_tag }} 
+                        {{ form.phone_number }}
+                    </div>
 
                     <!-- Submit Button -->
                     <div class="text-center">
