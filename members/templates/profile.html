@@ -21,6 +21,29 @@
                 <h5 class="text-primary mt-2">{{ greeting_message }}</h5>
                 <a href="{% url 'update_profile' %}" class="btn btn-primary mt-2">Edit Profile</a>
             </div>
+
+            <!-- Admin Tools Section for Superusers -->
+            {% if user.is_superuser %}
+            <div class="mt-4">
+                <div class="card p-3 admin-card">
+                    <h3>Admin Dashboard</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <a href="{% url 'admin:index' %}">Go to Admin Dashboard</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{% url 'admin:auth_user_changelist' %}">Manage Users</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{% url 'admin:members_event_changelist' %}">Manage Events</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="{% url 'admin:members_contribution_changelist' %}">Manage Contributions</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
         </div>
 
         <!-- User Info Section -->
@@ -84,28 +107,6 @@
                             {% endfor %}
                         </ul>
                     </div>
-                    
-
-                    <!-- Admin Tools Section for Superusers -->
-                    {% if user.is_superuser %}
-                    <div class="mt-5">
-                        <h3>Admin Dashboard</h3>
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <a href="{% url 'admin:index' %}">Go to Admin Dashboard</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="{% url 'admin:auth_user_changelist' %}">Manage Users</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="{% url 'admin:members_event_changelist' %}">Manage Events</a>
-                            </li>
-                            <li class="list-group-item">
-                                <a href="{% url 'admin:members_contribution_changelist' %}">Manage Contributions</a>
-                            </li>
-                        </ul>
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -143,6 +144,14 @@
         object-fit: cover;
         margin-bottom: 15px;
         border: 3px solid #007bff;
+    }
+
+    .admin-card {
+        background-color: #f8f9fa;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
     }
 
     /* Contribution items with color variance */
