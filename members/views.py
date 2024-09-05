@@ -15,7 +15,6 @@ import io
 import xlsxwriter
 from reportlab.lib.units import inch
 from datetime import datetime
-from .models import Profile
 
 def home(request):
     profiles = Profile.objects.all()  # Get all user profiles
@@ -28,6 +27,9 @@ def manage_contributions(request):
         if form.is_valid():
             form.save()
             return redirect('contributions_page')
+        else:
+            # Print form errors to console for debugging
+            print(form.errors)
     else:
         form = ContributionForm()
 
@@ -41,9 +43,12 @@ def manage_events(request):
         if form.is_valid():
             form.save()
             return redirect('events_page')
+        else:
+            # Print form errors to console for debugging
+            print(form.errors)
     else:
         form = EventForm()
-    
+
     events = Event.objects.all()
     return render(request, 'members/manage_events.html', {'form': form, 'events': events})
 
@@ -94,6 +99,7 @@ def profile(request):
         'event_contribution_stats': event_contribution_stats,
     }
     return render(request, 'profile.html', context)
+
 @login_required
 def update_profile(request):
     if request.method == 'POST':
@@ -107,10 +113,7 @@ def update_profile(request):
     else:
         form = ProfileUpdateForm(instance=request.user.profile)
 
-    context = {
-        'form': form,
-    }
-    return render(request, 'members/update_profile.html', context)
+    return render(request, 'members/update_profile.html', {'form': form})
 
 def events_page(request):
     # Fetch all active events
@@ -163,9 +166,12 @@ def signup(request):
             login(request, user)
             # Redirect to the home page
             return redirect('home')
+        else:
+            # Print form errors to console for debugging
+            print(form.errors)
     else:
         form = UserSignUpForm()
-    
+
     return render(request, 'registration/signup.html', {'form': form})
 
 class CustomPasswordResetView(PasswordResetView):
@@ -233,6 +239,7 @@ def export_contributions_pdf(request):
 
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename='contributions.pdf')
+
 def export_contributions_excel(request):
     selected_event = request.GET.get('event')
     if selected_event and selected_event != 'None':

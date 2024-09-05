@@ -7,12 +7,23 @@
     <h1 class="text-center mb-5">Members List</h1>
     <div class="row">
         {% for profile in profiles %}
-        <div class="col-md-4">
-            <div class="card mb-4 shadow-sm">
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+            <div class="card shadow-sm">
                 <div class="card-body text-center">
+                    <!-- Display Profile Image with fallback to a default image if not available -->
+                    {% if profile.image %}
                     <img src="{{ profile.image.url }}" class="rounded-circle img-fluid mb-3" alt="{{ profile.user.get_full_name }}" style="width: 100px; height: 100px; object-fit: cover;">
+                    {% else %}
+                    <img src="{% static 'default.jpg' %}" class="rounded-circle img-fluid mb-3" alt="Default Image" style="width: 100px; height: 100px; object-fit: cover;">
+                    {% endif %}
+
+                    <!-- Display Full Name -->
                     <h5 class="card-title">{{ profile.user.get_full_name }}</h5>
+
+                    <!-- Display Bio or default message -->
                     <p class="card-text">{{ profile.bio|default:"No bio available" }}</p>
+
+                    <!-- View Profile Button -->
                     <a href="{% url 'profile' profile.user.id %}" class="btn btn-outline-primary">View Profile</a>
                 </div>
             </div>

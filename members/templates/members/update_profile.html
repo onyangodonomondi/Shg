@@ -23,37 +23,50 @@
                 <!-- Profile Update Form -->
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <!-- Remove manually rendered image input field, rely on form rendering -->
+
+                    <!-- Image Field -->
                     <div class="form-group mb-3">
-                        {{ form.image.label_tag }}: 
-                        {{ form.image }} <!-- Rendered automatically -->
+                        <label for="{{ form.image.id_for_label }}">Profile Image</label>
+                        {{ form.image|as_crispy_field }}
+                        {% if form.image.errors %}
+                        <div class="text-danger">{{ form.image.errors }}</div>
+                        {% endif %}
                     </div>
 
-                    {{ form.non_field_errors }}
-
-                    <!-- Automatically render the form fields for other profile details -->
-                    {{ form.bio.errors }}
+                    <!-- Bio Field -->
                     <div class="form-group mb-3">
-                        {{ form.bio.label_tag }} 
-                        {{ form.bio }}
+                        <label for="{{ form.bio.id_for_label }}">Bio</label>
+                        {{ form.bio|as_crispy_field }}
+                        {% if form.bio.errors %}
+                        <div class="text-danger">{{ form.bio.errors }}</div>
+                        {% endif %}
                     </div>
 
-                    {{ form.location.errors }}
+                    <!-- Location Field -->
                     <div class="form-group mb-3">
-                        {{ form.location.label_tag }} 
-                        {{ form.location }}
+                        <label for="{{ form.location.id_for_label }}">Location</label>
+                        {{ form.location|as_crispy_field }}
+                        {% if form.location.errors %}
+                        <div class="text-danger">{{ form.location.errors }}</div>
+                        {% endif %}
                     </div>
 
-                    {{ form.birthdate.errors }}
+                    <!-- Birthdate Field -->
                     <div class="form-group mb-3">
-                        {{ form.birthdate.label_tag }} 
-                        {{ form.birthdate }}
+                        <label for="{{ form.birthdate.id_for_label }}">Birthdate</label>
+                        {{ form.birthdate|as_crispy_field }}
+                        {% if form.birthdate.errors %}
+                        <div class="text-danger">{{ form.birthdate.errors }}</div>
+                        {% endif %}
                     </div>
 
-                    {{ form.phone_number.errors }}
+                    <!-- Phone Number Field -->
                     <div class="form-group mb-3">
-                        {{ form.phone_number.label_tag }} 
-                        {{ form.phone_number }}
+                        <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                        {{ form.phone_number|as_crispy_field }}
+                        {% if form.phone_number.errors %}
+                        <div class="text-danger">{{ form.phone_number.errors }}</div>
+                        {% endif %}
                     </div>
 
                     <!-- Submit Button -->
@@ -83,6 +96,10 @@
     label {
         font-weight: bold;
         color: #343a40;
+    }
+    .text-danger {
+        color: red;
+        font-size: 0.875rem;
     }
 </style>
 {% endblock %}
