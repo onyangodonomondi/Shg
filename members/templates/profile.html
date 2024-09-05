@@ -8,7 +8,7 @@
     <div class="row">
         <!-- Profile Image and Greeting Message -->
         <div class="col-md-4">
-            <div class="card text-center profile-card p-3">
+            <div class="card text-center profile-card p-3" style="width: 100%; max-width: 350px;">
                 <!-- Profile Picture -->
                 {% if user.profile.image %}
                 <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
@@ -22,26 +22,24 @@
                 <a href="{% url 'update_profile' %}" class="btn btn-primary mt-2">Edit Profile</a>
             </div>
 
-            <!-- Admin Tools Section for Superusers -->
+            <!-- Admin Dashboard Section -->
             {% if user.is_superuser %}
-            <div class="mt-4">
-                <div class="card p-3 admin-card">
-                    <h3>Admin Dashboard</h3>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <a href="{% url 'admin:index' %}">Go to Admin Dashboard</a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="{% url 'admin:auth_user_changelist' %}">Manage Users</a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="{% url 'admin:members_event_changelist' %}">Manage Events</a>
-                        </li>
-                        <li class="list-group-item">
-                            <a href="{% url 'admin:members_contribution_changelist' %}">Manage Contributions</a>
-                        </li>
-                    </ul>
-                </div>
+            <div class="card admin-card mt-4 p-3" style="width: 100%; max-width: 350px;">
+                <h3 class="text-center mb-3">Admin Dashboard</h3>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <a href="{% url 'admin:index' %}" class="admin-link">Go to Admin Dashboard</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'admin:auth_user_changelist' %}" class="admin-link">Manage Users</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'admin:members_event_changelist' %}" class="admin-link">Manage Events</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{% url 'admin:members_contribution_changelist' %}" class="admin-link">Manage Contributions</a>
+                    </li>
+                </ul>
             </div>
             {% endif %}
         </div>
@@ -69,7 +67,7 @@
                         <ul class="list-unstyled">
                             <li><strong>Email:</strong> {{ user.email }}</li>
                             <li><strong>Phone:</strong> {{ user.profile.phone_number|default:"Not provided" }}</li>
-                            <li><strong>Birthday:</strong> {{ user.profile.birthdate|date:"d M, Y" }}</li> <!-- Birthday field added here -->
+                            <li><strong>Birthday:</strong> {{ user.profile.birthdate|date:"d M, Y" }}</li>
                         </ul>
                     </div>
 
@@ -113,15 +111,15 @@
     </div>
 </div>
 
-<!-- CSS for scrollable contributions list and profile card -->
+<!-- CSS for scrollable contributions list and profile/admin cards -->
 <style>
     .contributions-list {
         max-height: 200px;
         overflow-y: auto;
     }
 
-    /* Profile Card Styling */
-    .profile-card {
+    /* Profile and Admin Card Styling */
+    .profile-card, .admin-card {
         background-color: #ffffff;
         border-radius: 15px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -129,10 +127,11 @@
         text-align: center;
         transition: all 0.3s ease;
         margin-top: 20px;
-        max-width: 300px;
+        width: 100%;
+        max-width: 350px;
     }
 
-    .profile-card:hover {
+    .profile-card:hover, .admin-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
@@ -144,14 +143,6 @@
         object-fit: cover;
         margin-bottom: 15px;
         border: 3px solid #007bff;
-    }
-
-    .admin-card {
-        background-color: #f8f9fa;
-        border-radius: 15px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        text-align: center;
     }
 
     /* Contribution items with color variance */
@@ -176,6 +167,18 @@
     .badge.bg-warning {
         background-color: #ffc107;
         padding: 5px 10px;
+    }
+
+    .admin-link {
+        font-weight: bold;
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .admin-link:hover {
+        color: #0056b3;
+        text-decoration: underline;
     }
 </style>
 {% endblock %}
