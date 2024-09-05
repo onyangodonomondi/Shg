@@ -37,6 +37,7 @@
 
 .navbar-toggler {
     border-color: rgba(199, 199, 199, 0.781);
+    background-color: #e3f2fd;
     /* Light border color for the hamburger menu */
 }
 
