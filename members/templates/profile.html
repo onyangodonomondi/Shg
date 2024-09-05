@@ -74,6 +74,7 @@
                         
                         <h3>Event Contribution Statistics</h3>
                         <p>Total Members: {{ total_members }}</p>
+                        <!-- Add scrollable list for event contributors -->
                         <ul class="list-group event-contribution-list" style="max-height: 150px; overflow-y: auto;">
                             {% for event in event_contributors %}
                             <li class="list-group-item contribution-item">
@@ -83,6 +84,7 @@
                             {% endfor %}
                         </ul>
                     </div>
+                    
 
                     <!-- Admin Tools Section for Superusers -->
                     {% if user.is_superuser %}

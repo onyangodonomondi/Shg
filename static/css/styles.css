@@ -481,3 +481,76 @@ html {
     background-color: #e9ecef;
     border-left: 5px solid #28a745;
 }
+
+/* CSS for scrollable contributions list and profile card */
+.contributions-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Profile Card Styling */
+.profile-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    max-width: 300px;
+    /* Keeps the card responsive and centered */
+}
+
+.profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.profile-image {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid #007bff;
+}
+
+/* Contribution items with color variance */
+.contribution-item {
+    background-color: #f8f9fa;
+    margin-bottom: 10px;
+    border-left: 5px solid #007bff;
+}
+
+.contribution-item:nth-child(odd) {
+    background-color: #e9ecef;
+    border-left: 5px solid #28a745;
+}
+
+/* Badge styles */
+.badge.bg-success {
+    background-color: #28a745;
+    padding: 5px 10px;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107;
+    padding: 5px 10px;
+}
+
+/* Scrollable Event Contribution List */
+.event-contribution-list {
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.event-contribution-list .contribution-item {
+    background-color: #f8f9fa;
+    margin-bottom: 10px;
+    border-left: 5px solid #007bff;
+}
+
+.event-contribution-list .contribution-item:nth-child(odd) {
+    background-color: #e9ecef;
+    border-left: 5px solid #28a745;
+}
