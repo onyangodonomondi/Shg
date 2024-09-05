@@ -13,11 +13,12 @@
                 <!-- Profile Image Section -->
                 <div class="text-center mb-4">
                     {% if form.instance.image %}
-                    <img src="{{ form.instance.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                        <img src="{{ form.instance.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                        <p class="text-muted">Currently: <a href="{{ form.instance.image.url }}" target="_blank">{{ form.instance.image.name }}</a></p>
                     {% else %}
-                    <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                        <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                        <p class="text-muted">No image uploaded yet.</p>
                     {% endif %}
-                    <p class="text-muted">Currently: <a href="{{ form.instance.image.url }}" target="_blank">{{ form.instance.image.name }}</a></p>
                     <label class="btn btn-outline-primary">
                         Change: {{ form.image }}
                     </label>

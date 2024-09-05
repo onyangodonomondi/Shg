@@ -97,28 +97,21 @@ def profile(request):
 
 @login_required
 def update_profile(request):
-    # Get the user's profile instance
-    profile = request.user.profile
-
     if request.method == 'POST':
-        # Log the POST data for debugging
-        print(request.POST)
-        
-        # Create the form instance with POST data and files
-        form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
-        
-        # Check if the form is valid
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()
-            return redirect('profile')  # Redirect to profile page on success
+            return redirect('profile')
         else:
-            # Log form errors to debug any issues
+            # Print form errors to the console for debugging purposes
             print(form.errors)
     else:
-        # If GET request, display the form pre-filled with profile data
-        form = ProfileUpdateForm(instance=profile)
+        form = ProfileUpdateForm(instance=request.user.profile)
 
-    return render(request, 'members/update_profile.html', {'form': form})
+    context = {
+        'form': form,
+    }
+    return render(request, 'members/update_profile.html', context)
 
 def events_page(request):
     # Fetch all active events
