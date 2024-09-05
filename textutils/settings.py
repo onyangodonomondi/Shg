@@ -158,4 +158,9 @@ LOGGING = {
             'propagate': True,
         },
     },
+    'myapp': {
+            'handlers': ['file'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
 }

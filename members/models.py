@@ -17,8 +17,8 @@ class Profile(models.Model):
     number_of_children = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.user.username} Profile'
-
+        return f'{self.user.first_name} {self.user.last_name}'
+    
     def age(self):
         if self.birthdate:
             today = date.today()
@@ -27,10 +27,6 @@ class Profile(models.Model):
 
     age.short_description = 'Age'
 
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
 
 class EventCategory(models.Model):
     name = models.CharField(max_length=100)

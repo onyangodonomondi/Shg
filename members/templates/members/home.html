@@ -116,7 +116,7 @@
                             <div class="ml-3">
                                 <h4 class="font-weight-bold mb-1">{{ profile.user.get_full_name }}</h4>
                                 <p class="text-muted mb-1">{{ profile.phone_number|default:"Phone not provided" }}</p>
-                                <p class="text-muted">{{ profile.bio|default:"No bio available" }}</p>
+                                <p class="text-muted">{{ profile.user.email|default:"Email not provided" }}</p>
                             </div>
                         </div>
                     </div>

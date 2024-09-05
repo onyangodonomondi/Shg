@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}Update Profile{% endblock %}
 
@@ -23,54 +24,10 @@
                 <!-- Profile Update Form -->
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-
-                    <!-- Image Field -->
-                    <div class="form-group mb-3">
-                        <label for="{{ form.image.id_for_label }}">Profile Image</label>
-                        {{ form.image|as_crispy_field }}
-                        {% if form.image.errors %}
-                        <div class="text-danger">{{ form.image.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Bio Field -->
-                    <div class="form-group mb-3">
-                        <label for="{{ form.bio.id_for_label }}">Bio</label>
-                        {{ form.bio|as_crispy_field }}
-                        {% if form.bio.errors %}
-                        <div class="text-danger">{{ form.bio.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Location Field -->
-                    <div class="form-group mb-3">
-                        <label for="{{ form.location.id_for_label }}">Location</label>
-                        {{ form.location|as_crispy_field }}
-                        {% if form.location.errors %}
-                        <div class="text-danger">{{ form.location.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Birthdate Field -->
-                    <div class="form-group mb-3">
-                        <label for="{{ form.birthdate.id_for_label }}">Birthdate</label>
-                        {{ form.birthdate|as_crispy_field }}
-                        {% if form.birthdate.errors %}
-                        <div class="text-danger">{{ form.birthdate.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <!-- Phone Number Field -->
-                    <div class="form-group mb-3">
-                        <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
-                        {{ form.phone_number|as_crispy_field }}
-                        {% if form.phone_number.errors %}
-                        <div class="text-danger">{{ form.phone_number.errors }}</div>
-                        {% endif %}
-                    </div>
+                    {{ form|crispy }}
 
                     <!-- Submit Button -->
-                    <div class="text-center">
+                    <div class="text-center mt-3">
                         <button type="submit" class="btn btn-primary btn-block" style="padding: 10px 30px; font-size: 1.2rem; border-radius: 10px;">Update Profile</button>
                     </div>
                 </form>

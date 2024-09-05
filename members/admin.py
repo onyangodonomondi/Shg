@@ -23,13 +23,6 @@ class UserAdmin(BaseUserAdmin):
             return []
         return super(UserAdmin, self).get_inline_instances(request, obj)
 
-    def get_fieldsets(self, request, obj=None):
-        fieldsets = super().get_fieldsets(request, obj)
-        if obj:
-            fieldsets = list(fieldsets)
-            fieldsets.append(('NYAGWA SHG Profile', {'fields': ('profile',)}))
-        return fieldsets
-
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
@@ -39,7 +32,7 @@ admin.site.register(User, UserAdmin)
 class EventAdmin(admin.ModelAdmin):
     list_display = ('name', 'date', 'required_amount', 'is_active')
     search_fields = ('name',)
-    list_filter = ('date', 'is_active')  # Added filter for active status
+    list_filter = ('date', 'is_active')
     ordering = ('date',)
     fieldsets = (
         ('Event Details', {
@@ -55,8 +48,8 @@ class EventAdmin(admin.ModelAdmin):
 @admin.register(Contribution)
 class ContributionAdmin(admin.ModelAdmin):
     list_display = ('get_profile_name', 'event', 'amount', 'category')
-    search_fields = ('profile__user__first_name', 'profile__user__last_name', 'event__name')  # Fixed to use first_name and last_name
-    list_filter = ('event', 'profile__user__first_name', 'profile__user__last_name')  # Adjusted list filter
+    search_fields = ('profile__user__first_name', 'profile__user__last_name', 'event__name')
+    list_filter = ('event', 'profile__user__first_name', 'profile__user__last_name')
     ordering = ('event', 'profile__user__last_name')
     readonly_fields = ('category',)
 

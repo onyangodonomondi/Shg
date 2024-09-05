@@ -15,6 +15,8 @@ import io
 import xlsxwriter
 from reportlab.lib.units import inch
 from datetime import datetime
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 def home(request):
     profiles = Profile.objects.all()  # Get all user profiles
@@ -53,8 +55,8 @@ def manage_events(request):
     return render(request, 'members/manage_events.html', {'form': form, 'events': events})
 
 @login_required
-def profile(request):
-    user = request.user
+def profile(request, user_id):
+    user = get_object_or_404(User, pk=user_id)  # Fetch the user by user_id
     contributions = Contribution.objects.filter(profile=user.profile)
 
     # Calculate total contributions
@@ -89,7 +91,7 @@ def profile(request):
             'event_name': event.name,
             'total_contributed': total_contributions,
             'contributors_count': contributors_count,
-            'total_users': total_users  # Ensure total number of users is fetched and passed
+            'total_users': total_users
         })
 
     context = {
@@ -97,6 +99,7 @@ def profile(request):
         'total_contributed': total_contributed,
         'greeting_message': greeting_message,
         'event_contribution_stats': event_contribution_stats,
+        'profile_user': user,  # Add this to refer to the profile's user
     }
     return render(request, 'profile.html', context)
 
@@ -106,10 +109,7 @@ def update_profile(request):
         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()
-            return redirect('profile')
-        else:
-            # Print form errors to the console for debugging purposes
-            print(form.errors)
+            return redirect('profile', user_id=request.user.id)  # Pass user_id in redirect
     else:
         form = ProfileUpdateForm(instance=request.user.profile)
 

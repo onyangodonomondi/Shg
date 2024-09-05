@@ -10,20 +10,20 @@
         <div class="col-md-4">
             <div class="card text-center profile-card p-3" style="width: 100%; max-width: 350px;">
                 <!-- Profile Picture -->
-                {% if user.profile.image %}
-                <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
+                {% if profile_user.profile.image %}
+                <img src="{{ profile_user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
                 {% else %}
                 <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
                 {% endif %}
                 
                 <!-- Center-aligned Name and Greeting -->
-                <h2 class="mt-3">{{ user.get_full_name }}</h2>
+                <h2 class="mt-3">{{ profile_user.get_full_name }}</h2>
                 <h5 class="text-primary mt-2">{{ greeting_message }}</h5>
                 <a href="{% url 'update_profile' %}" class="btn btn-primary mt-2">Edit Profile</a>
             </div>
 
             <!-- Admin Dashboard Section -->
-            {% if user.is_superuser %}
+            {% if profile_user.is_superuser %}
             <div class="card admin-card mt-4 p-3" style="width: 100%; max-width: 350px;">
                 <h3 class="text-center mb-3">Admin Dashboard</h3>
                 <ul class="list-group list-group-flush">
@@ -52,23 +52,37 @@
                         <button class="nav-link active" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab" aria-controls="about" aria-selected="true">About</button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="posts-tab" data-bs-toggle="tab" data-bs-target="#posts" type="button" role="tab" aria-controls="posts" aria-selected="false">Posts</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
                         <button class="nav-link" id="contributions-tab" data-bs-toggle="tab" data-bs-target="#contributions" type="button" role="tab" aria-controls="contributions" aria-selected="false">Contributions</button>
                     </li>
                 </ul>
                 <div class="tab-content" id="profileTabsContent">
                     <div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="about-tab">
                         <h3 class="mt-3">Bio</h3>
-                        <p>{{ user.profile.bio|default:"No bio available" }}</p>
+                        <p>{{ profile_user.profile.bio|default:"No bio available" }}</p>
 
                         <h3 class="mt-4">Contact Information</h3>
-                        <ul class="list-unstyled">
-                            <li><strong>Email:</strong> {{ user.email }}</li>
-                            <li><strong>Phone:</strong> {{ user.profile.phone_number|default:"Not provided" }}</li>
-                            <li><strong>Birthday:</strong> {{ user.profile.birthdate|date:"d M, Y" }}</li>
-                        </ul>
+                        <!-- New styled contact info card -->
+                        <div class="card mt-4 shadow-sm">
+                            <div class="card-header bg-primary text-white text-center">
+                                <h4 class="mb-0">Contact Information</h4>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled contact-info-list">
+                                    <li class="mb-2">
+                                        <i class="fas fa-envelope text-primary"></i> 
+                                        <strong>Email:</strong> {{ profile_user.email }}
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-phone-alt text-success"></i>
+                                        <strong>Phone:</strong> {{ profile_user.profile.phone_number|default:"Not provided" }}
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-birthday-cake text-warning"></i>
+                                        <strong>Birthday:</strong> {{ profile_user.profile.birthdate|date:"d M, Y" }}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Contributions Tab -->
@@ -94,12 +108,13 @@
                         <p>Total: {{ total_contributed }} Ksh</p>
                         
                         <h3>Event Contribution Statistics</h3>
-                        <p>Total Members: {{ total_members }}</p>
+                        <p>Total Members: {{ total_users }}</p>
                         <!-- Add scrollable list for event contributors -->
                         <ul class="list-group event-contribution-list" style="max-height: 150px; overflow-y: auto;">
-                            {% for event in event_contributors %}
+                            {% for event in event_contribution_stats %}
                             <li class="list-group-item contribution-item">
-                                <strong>Event:</strong> {{ event.event.name }}<br>
+                                <strong>Event Name:</strong> {{ event.event_name }}<br>
+                                <strong>Total Contributed:</strong> {{ event.total_contributed }} Ksh<br>
                                 <strong>Contributors:</strong> {{ event.contributors_count }} contributors
                             </li>
                             {% endfor %}
@@ -169,16 +184,39 @@
         padding: 5px 10px;
     }
 
-    .admin-link {
-        font-weight: bold;
-        color: #007bff;
-        text-decoration: none;
-        transition: color 0.3s ease;
+    /* Contact Info Styling */
+    .contact-info-list {
+        font-size: 1.1rem;
+        color: #555;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
     }
 
-    .admin-link:hover {
-        color: #0056b3;
-        text-decoration: underline;
+    .contact-info-list li {
+        display: flex;
+        align-items: center;
+    }
+
+    .contact-info-list li i {
+        margin-right: 10px;
+        font-size: 1.5rem;
+    }
+
+    .contact-info-list strong {
+        color: #333;
+        font-weight: bold;
+    }
+
+    /* Card and header customization */
+    .card-header {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+    }
+
+    .card-body {
+        padding: 20px;
     }
 </style>
 {% endblock %}
