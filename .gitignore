@@ -16,9 +16,6 @@ db.sqlite3
 .env
 *.env
 
-# Django static files
-/staticfiles/
-/media/
 
 # Local development settings
 /local_settings.py
