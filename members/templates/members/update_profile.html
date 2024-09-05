@@ -12,44 +12,21 @@
 
                 <!-- Profile Image Section -->
                 <div class="text-center mb-4">
-                    {% if user.profile.image %}
-                    <img src="{{ user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                    {% if form.instance.image %}
+                    <img src="{{ form.instance.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
                     {% else %}
                     <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
                     {% endif %}
-                    <p class="text-muted">Currently: <a href="{{ user.profile.image.url }}" target="_blank">{{ user.profile.image.name }}</a></p>
+                    <p class="text-muted">Currently: <a href="{{ form.instance.image.url }}" target="_blank">{{ form.instance.image.name }}</a></p>
                     <label class="btn btn-outline-primary">
-                        Change: <input type="file" style="display: none;" name="profile_image">
+                        Change: {{ form.image }}
                     </label>
                 </div>
 
                 <!-- Profile Update Form -->
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-
-                    <!-- Bio Section -->
-                    <div class="form-group mb-3">
-                        <label for="bio">Bio:</label>
-                        <textarea id="bio" name="bio" class="form-control" placeholder="Write something about yourself...">{{ user.profile.bio }}</textarea>
-                    </div>
-
-                    <!-- Location Section -->
-                    <div class="form-group mb-3">
-                        <label for="location">Location:</label>
-                        <input id="location" type="text" name="location" class="form-control" placeholder="Enter your location" value="{{ user.profile.location }}">
-                    </div>
-
-                    <!-- Birthdate Section -->
-                    <div class="form-group mb-3">
-                        <label for="birthdate">Birthdate:</label>
-                        <input id="birthdate" type="date" name="birthdate" class="form-control" value="{{ user.profile.birthdate }}">
-                    </div>
-
-                    <!-- Phone Number Section -->
-                    <div class="form-group mb-3">
-                        <label for="phone_number">Phone Number:</label>
-                        <input id="phone_number" type="text" name="phone_number" class="form-control" placeholder="Enter your phone number" value="{{ user.profile.phone_number }}">
-                    </div>
+                    {{ form.as_p }} <!-- Automatically render the form fields -->
 
                     <!-- Submit Button -->
                     <div class="text-center">
@@ -78,9 +55,6 @@
     label {
         font-weight: bold;
         color: #343a40;
-    }
-    input[type="file"] {
-        display: none;
     }
 </style>
 {% endblock %}
