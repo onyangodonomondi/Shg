@@ -17,6 +17,7 @@ class Profile(models.Model):
     othernames = models.CharField(max_length=100)
     has_children = models.BooleanField(default=False)
     number_of_children = models.PositiveIntegerField(null=True, blank=True)
+
     
     # Lineage tracking fields
     father = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='father_children')
