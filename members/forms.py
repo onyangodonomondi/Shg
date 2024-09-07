@@ -20,12 +20,11 @@ class UserSignUpForm(UserCreationForm):
 
         if commit:
             user.save()
-            # Save phone number to the profile after the user is created
-            Profile.objects.create(
-                user=user,
-                phone_number=self.cleaned_data['phone_number'],
-            )
+            # Update the profile after it's created by the signal
+            user.profile.phone_number = self.cleaned_data['phone_number']
+            user.profile.save()
         return user
+
 class UserUpdateForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     first_name = forms.CharField(max_length=30, required=True)
