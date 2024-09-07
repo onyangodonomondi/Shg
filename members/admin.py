@@ -61,7 +61,7 @@ class UserAdmin(BaseUserAdmin):
 # Re-register UserAdmin with custom profile inline
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(Profile, ProfileAdmin)
+
 # Admin customization for Event
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -108,6 +108,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 
 # Customizing the admin site titles
+admin.site.register(Profile, ProfileAdmin)
 admin.site.site_header = "NYAGWA SHG Administration"
 admin.site.site_title = "NYAGWA SHG Admin Portal"
 admin.site.index_title = "Welcome to NYAGWA SHG Administration Portal"
