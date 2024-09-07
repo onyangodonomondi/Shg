@@ -6,57 +6,145 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card p-4 shadow-lg" style="border-radius: 15px;">
-                <h2 class="text-center mb-4">Update Profile</h2>
+    <h2 class="mb-4">Personal Information</h2>
 
-                <!-- Profile Image Section -->
-                <div class="text-center mb-4">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <!-- Profile Image Section -->
+            <div class="col-md-3 text-center mb-4">
+                <div class="profile-image-container">
                     {% if form.instance.image %}
-                    <img src="{{ form.instance.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                    <img src="{{ form.instance.image.url }}" alt="Profile Picture" class="rounded-circle profile-image">
                     {% else %}
-                    <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 2px solid #007bff;">
+                    <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="rounded-circle profile-image">
                     {% endif %}
-                    <p class="text-muted">Currently: <a href="{{ form.instance.image.url }}" target="_blank">{{ form.instance.image.name }}</a></p>
+                </div>
+                <div class="mt-3">
+                    <input type="file" name="image" class="form-control-file">
+                </div>
+            </div>
+
+            <!-- Personal Info Fields -->
+            <div class="col-md-9">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="first_name" class="form-label">First Name</label>
+                        <input type="text" name="first_name" id="first_name" class="form-control rounded-pill" value="{{ form.instance.user.first_name }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="last_name" class="form-label">Last Name</label>
+                        <input type="text" name="last_name" id="last_name" class="form-control rounded-pill" value="{{ form.instance.user.last_name }}" required>
+                    </div>
                 </div>
 
-                <!-- Profile Update Form -->
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-
-                    <!-- Submit Button -->
-                    <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-primary btn-block" style="padding: 10px 30px; font-size: 1.2rem; border-radius: 10px;">Update Profile</button>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" name="email" id="email" class="form-control rounded-pill" value="{{ form.instance.user.email }}" required>
                     </div>
-                </form>
+                    <div class="col-md-6 mb-3">
+                        <label for="phone_number" class="form-label">Phone Number</label>
+                        <input type="text" name="phone_number" id="phone_number" class="form-control rounded-pill" value="{{ form.instance.phone_number }}" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="father" class="form-label">Father</label>
+                        {{ form.father|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="mother" class="form-label">Mother</label>
+                        {{ form.mother|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="has_children" class="form-label">Do you have children?</label>
+                        {{ form.has_children|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6 mb-3" id="children-section" style="{% if not form.has_children.value %}display: none;{% endif %}">
+                        <label for="number_of_children" class="form-label">Number of Children</label>
+                        {{ form.number_of_children|as_crispy_field }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4 rounded-pill">Save Changes</button>
             </div>
         </div>
-    </div>
+    </form>
 </div>
 
 <!-- Custom CSS -->
 <style>
-    .card {
-        border: none;
-        border-radius: 15px;
-        padding: 2rem;
+    .profile-image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
+
+    .profile-image {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border: 3px solid #007bff;
+        border-radius: 50%;
+    }
+
     .form-control {
-        border-radius: 10px;
-        padding: 10px;
+        border: 1px solid #ced4da;
+        padding: 12px;
+        font-size: 1rem;
+        border-radius: 30px;
+        transition: border-color 0.2s ease-in-out;
     }
-    textarea.form-control {
-        height: 120px;
+
+    .form-control:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: none;
     }
-    label {
+
+    .form-label {
         font-weight: bold;
         color: #343a40;
     }
-    .text-danger {
-        color: red;
-        font-size: 0.875rem;
+
+    .btn-primary {
+        padding: 10px 30px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    @media (max-width: 576px) {
+        .form-control {
+            font-size: 0.9rem;
+            padding: 8px 10px;
+        }
     }
 </style>
+
+<!-- Script to toggle the number of children input based on has_children field -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hasChildrenField = document.getElementById('id_has_children');
+        const childrenSection = document.getElementById('children-section');
+
+        function toggleChildrenField() {
+            if (hasChildrenField.checked) {
+                childrenSection.style.display = 'block';
+            } else {
+                childrenSection.style.display = 'none';
+            }
+        }
+
+        // Initially toggle the field
+        toggleChildrenField();
+
+        // Add event listener to toggle the children input field dynamically
+        hasChildrenField.addEventListener('change', toggleChildrenField);
+    });
+</script>
 {% endblock %}
