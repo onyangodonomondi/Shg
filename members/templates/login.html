@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
+{% load static %}  <!-- Add this line to load the static template tag -->
 
 {% block title %}Login{% endblock %}
 
 {% block content %}
 <div class="login-container">
     <div class="login-box">
-        <div class="login-header">
-            <h2>Log in to NYAGWA SHG</h2>
+        <div class="avatar">
+            <img src="{% static 'images/Avatar.jpg' %}" alt="Avatar">
         </div>
+        <h2 class="text-center">LOGIN</h2>
         <form method="post">
             {% csrf_token %}
             {% if form.errors %}
@@ -23,18 +25,22 @@
                 </div>
             {% endif %}
             <div class="form-group">
-                <label for="username"><i class="fa fa-user"></i> Username:</label>
+                <label for="username"><i class="fa fa-user"></i> Username</label>
                 <input type="text" name="username" id="username" class="form-control" required autofocus>
             </div>
             <div class="form-group">
-                <label for="password"><i class="fa fa-lock"></i> Password:</label>
+                <label for="password"><i class="fa fa-lock"></i> Password</label>
                 <input type="password" name="password" id="password" class="form-control" required>
             </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="remember-me">
+                <label class="form-check-label" for="remember-me">Remember me</label>
+            </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <button type="submit" class="btn btn-primary btn-block">LOGIN</button>
             </div>
             <div class="login-footer">
-                <a href="{% url 'password_reset' %}">Forgot your password?</a>
+                <a href="{% url 'password_reset' %}">Forgot Username / Password?</a>
             </div>
         </form>
     </div>

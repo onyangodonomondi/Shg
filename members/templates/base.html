@@ -47,8 +47,13 @@
               </li>
               {% if user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'profile' user.id %}">Profile</a> <!-- Pass user.id here -->
+                <a class="nav-link" href="{% url 'profile' user.id %}">Profile</a>
               </li>
+              {% if user.is_staff %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+              </li>
+              {% endif %}
               <li class="nav-item">
                 <!-- Logout form -->
                 <form id="logout-form" action="{% url 'logout' %}" method="POST" style="display: none">
