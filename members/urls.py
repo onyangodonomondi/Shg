@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     # Home Page
     path('', views.home, name='home'),
+    path('lineage/', views.lineage_view, name='lineage'),
 
     # Event Management
     path('events/', views.events_page, name='events_page'),

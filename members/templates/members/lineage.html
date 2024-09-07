@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Family Lineage{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">Family Lineage Hierarchy</h1>
+
+    <!-- Recursively render the hierarchical family structure -->
+    <div class="family-tree">
+        <ul>
+            {% for father, children in families.items %}
+                <!-- Display the father -->
+                <li>
+                    <div class="profile-card">
+                        <img src="{{ father.image.url }}" alt="{{ father.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px;">
+                        <h4>{{ father.user.first_name }} {{ father.user.last_name }}</h4>
+                        <p><strong>Father:</strong> {% if father.father %}{{ father.father.user.first_name }} {{ father.father.user.last_name }}{% else %}Unknown{% endif %}</p>
+                        <p><strong>Mother:</strong> {% if father.mother %}{{ father.mother.user.first_name }} {{ father.mother.user.last_name }}{% else %}Unknown{% endif %}</p>
+                    </div>
+
+                    <!-- If the father has children, render them recursively -->
+                    {% if children %}
+                    <ul>
+                        {% for child in children %}
+                            <li>
+                                <div class="profile-card">
+                                    <img src="{{ child.image.url }}" alt="{{ child.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 75px; height: 75px;">
+                                    <h5>{{ child.user.first_name }} {{ child.user.last_name }}</h5>
+                                    <p><strong>Father:</strong> {{ child.father.user.first_name }} {{ child.father.user.last_name }}</p>
+                                    <p><strong>Mother:</strong> {% if child.mother %}{{ child.mother.user.first_name }} {{ child.mother.user.last_name }}{% else %}Unknown{% endif %}</p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

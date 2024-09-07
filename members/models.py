@@ -9,8 +9,8 @@ from PIL import Image
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
-    bio = models.TextField(max_length=500, blank=True)  # Field for bio
-    location = models.CharField(max_length=100, blank=True)  # Field for location
+    bio = models.TextField(max_length=500, blank=True)
+    location = models.CharField(max_length=100, blank=True)
     birthdate = models.DateField(null=True, blank=True)
     phone_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField(blank=True)
@@ -18,7 +18,6 @@ class Profile(models.Model):
     has_children = models.BooleanField(default=False)
     number_of_children = models.PositiveIntegerField(null=True, blank=True)
 
-    
     # Lineage tracking fields
     father = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='father_children')
     mother = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='mother_children')
@@ -41,14 +40,8 @@ class Profile(models.Model):
     def optimize_image(self):
         """Resize and crop the image to a square while focusing on the head."""
         img = Image.open(self.image.path)
-
-        # Set the desired output size (e.g., 300x300)
         output_size = (300, 300)
-
-        # Resize while maintaining the aspect ratio
         img.thumbnail(output_size)
-
-        # Crop to focus on the top portion (to keep the head centered)
         width, height = img.size
         if width > height:
             left = (width - height) // 2
@@ -60,9 +53,15 @@ class Profile(models.Model):
             left, right = 0, width
 
         img = img.crop((left, top, right, bottom))
-        
-        # Save the optimized image in a proper format
         img.save(self.image.path, quality=85, optimize=True)
+
+    # Method to get siblings (brothers and sisters)
+    def get_siblings(self):
+        siblings_from_father = Profile.objects.filter(father=self.father).exclude(pk=self.pk)
+        siblings_from_mother = Profile.objects.filter(mother=self.mother).exclude(pk=self.pk)
+        siblings = siblings_from_father | siblings_from_mother
+        return siblings.distinct()
+
 
 
 class EventCategory(models.Model):
