@@ -6,47 +6,25 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row">
-        <!-- Profile Image and Greeting Message -->
+        <!-- Profile Sidebar for User Image and Actions -->
         <div class="col-md-4">
-            <div class="card text-center profile-card p-3" style="width: 100%; max-width: 350px;">
-                <!-- Profile Picture -->
+            <div class="card profile-card mb-4 shadow-sm">
                 {% if profile_user.profile.image %}
-                <img src="{{ profile_user.profile.image.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
+                <img src="{{ profile_user.profile.image.url }}" alt="Profile Picture" class="card-img-top rounded-circle mx-auto d-block profile-image" style="width: 140px; height: 140px; margin-top: -70px;">
                 {% else %}
-                <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="img-fluid rounded-circle mb-3 profile-image">
+                <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="card-img-top rounded-circle mx-auto d-block profile-image" style="width: 140px; height: 140px; margin-top: -70px;">
                 {% endif %}
-                
-                <!-- Center-aligned Name and Greeting -->
-                <h2 class="mt-3">{{ profile_user.get_full_name }}</h2>
-                <h5 class="text-primary mt-2">{{ greeting_message }}</h5>
-                <a href="{% url 'update_profile' %}" class="btn btn-primary mt-2">Edit Profile</a>
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ profile_user.get_full_name }}</h5>
+                    <p class="card-text">{{ greeting_message }}</p>
+                    <a href="{% url 'update_profile' %}" class="btn btn-sm btn-primary">Edit Profile</a>
+                </div>
             </div>
-
-            <!-- Admin Dashboard Section -->
-            {% if profile_user.is_superuser %}
-            <div class="card admin-card mt-4 p-3" style="width: 100%; max-width: 350px;">
-                <h3 class="text-center mb-3">Admin Dashboard</h3>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <a href="{% url 'admin:index' %}" class="admin-link">Go to Admin Dashboard</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="{% url 'admin:auth_user_changelist' %}" class="admin-link">Manage Users</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="{% url 'admin:members_event_changelist' %}" class="admin-link">Manage Events</a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="{% url 'admin:members_contribution_changelist' %}" class="admin-link">Manage Contributions</a>
-                    </li>
-                </ul>
-            </div>
-            {% endif %}
         </div>
 
         <!-- User Info Section -->
         <div class="col-md-8">
-            <div class="card p-4">
+            <div class="card p-4 shadow-sm">
                 <ul class="nav nav-tabs" id="profileTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab" aria-controls="about" aria-selected="true">About</button>
@@ -61,25 +39,32 @@
                         <p>{{ profile_user.profile.bio|default:"No bio available" }}</p>
 
                         <h3 class="mt-4">Contact Information</h3>
-                        <!-- New styled contact info card -->
                         <div class="card mt-4 shadow-sm">
                             <div class="card-header bg-primary text-white text-center">
                                 <h4 class="mb-0">Contact Information</h4>
                             </div>
                             <div class="card-body">
-                                <ul class="list-unstyled contact-info-list">
-                                    <li class="mb-2">
-                                        <i class="fas fa-envelope text-primary"></i> 
-                                        <strong>Email:</strong> {{ profile_user.email }}
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-phone-alt text-success"></i>
-                                        <strong>Phone:</strong> {{ profile_user.profile.phone_number|default:"Not provided" }}
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="fas fa-birthday-cake text-warning"></i>
-                                        <strong>Birthday:</strong> {{ profile_user.profile.birthdate|date:"d M, Y" }}
-                                    </li>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><strong>Email:</strong> {{ profile_user.email }}</li>
+                                    <li class="mb-2"><strong>Phone:</strong> {{ profile_user.profile.phone_number|default:"Not provided" }}</li>
+                                    <li class="mb-2"><strong>Birthday:</strong> {{ profile_user.profile.birthdate|date:"d M, Y" }}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3 class="mt-4">Family Information</h3>
+                        <div class="card mt-4 shadow-sm">
+                            <div class="card-header bg-info text-white text-center">
+                                <h4 class="mb-0">Lineage Information</h4>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><strong>Father:</strong> {{ profile_user.profile.father.get_full_name|default:"Not provided" }}</li>
+                                    <li class="mb-2"><strong>Mother:</strong> {{ profile_user.profile.mother.get_full_name|default:"Not provided" }}</li>
+                                    <li class="mb-2"><strong>Has Children:</strong> {% if profile_user.profile.has_children %}Yes{% else %}No{% endif %}</li>
+                                    {% if profile_user.profile.has_children %}
+                                    <li class="mb-2"><strong>Number of Children:</strong> {{ profile_user.profile.number_of_children }}</li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>
@@ -89,9 +74,9 @@
                     <div class="tab-pane fade" id="contributions" role="tabpanel" aria-labelledby="contributions-tab">
                         <h3 class="mt-3">Your Contributions</h3>
                         {% if user_contributions %}
-                        <ul class="list-group mt-3 contributions-list">
+                        <ul class="list-group mt-3">
                             {% for contribution in user_contributions %}
-                            <li class="list-group-item contribution-item">
+                            <li class="list-group-item">
                                 <strong>Event:</strong> {{ contribution.event.name }}<br>
                                 <strong>Amount:</strong> {{ contribution.amount }} Ksh<br>
                                 <strong>Status:</strong> 
@@ -106,13 +91,12 @@
                         {% endif %}
                         <h3>Total Amount Contributed</h3>
                         <p>Total: {{ total_contributed }} Ksh</p>
-                        
+
                         <h3>Event Contribution Statistics</h3>
                         <p>Total Members: {{ total_users }}</p>
-                        <!-- Add scrollable list for event contributors -->
-                        <ul class="list-group event-contribution-list" style="max-height: 150px; overflow-y: auto;">
+                        <ul class="list-group" style="max-height: 150px; overflow-y: auto;">
                             {% for event in event_contribution_stats %}
-                            <li class="list-group-item contribution-item">
+                            <li class="list-group-item">
                                 <strong>Event Name:</strong> {{ event.event_name }}<br>
                                 <strong>Total Contributed:</strong> {{ event.total_contributed }} Ksh<br>
                                 <strong>Contributors:</strong> {{ event.contributors_count }} contributors
@@ -126,97 +110,35 @@
     </div>
 </div>
 
-<!-- CSS for scrollable contributions list and profile/admin cards -->
+<!-- Custom CSS -->
 <style>
-    .contributions-list {
-        max-height: 200px;
-        overflow-y: auto;
-    }
-
-    /* Profile and Admin Card Styling */
-    .profile-card, .admin-card {
+    .profile-card {
+        padding-top: 40px;
         background-color: #ffffff;
         border-radius: 15px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding: 20px;
         text-align: center;
-        transition: all 0.3s ease;
-        margin-top: 20px;
-        width: 100%;
-        max-width: 350px;
     }
-
-    .profile-card:hover, .admin-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    }
-
     .profile-image {
-        border-radius: 50%;
-        width: 120px;
-        height: 120px;
         object-fit: cover;
-        margin-bottom: 15px;
         border: 3px solid #007bff;
     }
-
-    /* Contribution items with color variance */
-    .contribution-item {
-        background-color: #f8f9fa;
-        margin-bottom: 10px;
-        border-left: 5px solid #007bff;
-        padding: 10px;
-        border-radius: 10px;
-    }
-
-    .contribution-item:nth-child(odd) {
-        background-color: #e9ecef;
-        border-left: 5px solid #28a745;
-    }
-
-    .badge.bg-success {
-        background-color: #28a745;
-        padding: 5px 10px;
-    }
-
-    .badge.bg-warning {
-        background-color: #ffc107;
-        padding: 5px 10px;
-    }
-
-    /* Contact Info Styling */
-    .contact-info-list {
-        font-size: 1.1rem;
-        color: #555;
-        margin-bottom: 10px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .contact-info-list li {
-        display: flex;
-        align-items: center;
-    }
-
-    .contact-info-list li i {
-        margin-right: 10px;
-        font-size: 1.5rem;
-    }
-
-    .contact-info-list strong {
-        color: #333;
-        font-weight: bold;
-    }
-
-    /* Card and header customization */
     .card-header {
         background-color: #007bff;
         color: white;
-        padding: 15px;
+        padding: 10px;
     }
-
-    .card-body {
-        padding: 20px;
+    .nav-tabs .nav-link.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+    .list-unstyled {
+        margin-bottom: 0;
+        padding-left: 0;
+        list-style: none;
+    }
+    .list-group-item {
+        background-color: #f8f9fa;
     }
 </style>
 {% endblock %}
