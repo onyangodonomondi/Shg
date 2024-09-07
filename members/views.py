@@ -18,9 +18,78 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 
+from django.shortcuts import render
+from django.db.models import Sum, Count
+from .models import Contribution, Event
+from django.core.paginator import Paginator
+
 def home(request):
-    profiles = Profile.objects.all()  # Get all user profiles
-    return render(request, 'members/home.html', {'profiles': profiles})
+    # Fetch all contributions
+    contributions = Contribution.objects.all()
+
+    contributions_data = []
+
+    for contribution in contributions:
+        # Count the unique events for each profile
+        event_count = Contribution.objects.filter(profile=contribution.profile).values('event').distinct().count()
+
+        # Sum of all contributions for each profile
+        total_contributions = Contribution.objects.filter(profile=contribution.profile).aggregate(Sum('amount'))['amount__sum'] or 0
+
+        # Determine if the contribution is full based on event required amount
+        required_amount = contribution.event.required_amount
+        is_full = contribution.amount >= required_amount
+
+        # Append the contribution data, including event count, total contributions, and full/partial status
+        contributions_data.append({
+            'profile': contribution.profile,
+            'event': contribution.event,
+            'amount': contribution.amount,
+            'is_full': is_full,
+            'event_count': event_count,
+            'total_contributions': total_contributions
+        })
+
+    # Paginate the contributions (10 per page)
+    paginator = Paginator(contributions_data, 10)  # Show 10 contributions per page
+
+    # Get the current page number from the request
+    page_number = request.GET.get('page')
+
+    # Get the contributions for the current page
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'members/home.html', {'page_obj': page_obj})
+
+def lineage_view(request):
+    # Get all profiles
+    profiles = Profile.objects.all()
+
+    # Group profiles by their father
+    families = {}
+    for profile in profiles:
+        # If no father, they are the top-most individuals
+        if profile.father is None:
+            families[profile] = []
+        else:
+            # Add children under their respective fathers
+            if profile.father not in families:
+                families[profile.father] = []
+            families[profile.father].append(profile)
+
+    context = {
+        'families': families,
+    }
+    return render(request, 'members/lineage.html', context)
+
+def profile_detail(request, pk):
+    profile = get_object_or_404(Profile, pk=pk)
+    siblings = profile.get_siblings()
+    context = {
+        'profile': profile,
+        'siblings': siblings,
+    }
+    return render(request, 'profile_detail.html', context)
 
 @user_passes_test(lambda u: u.is_staff)
 def manage_contributions(request):
