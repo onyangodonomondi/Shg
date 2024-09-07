@@ -59,8 +59,20 @@
                             </div>
                             <div class="card-body">
                                 <ul class="list-unstyled">
-                                    <li class="mb-2"><strong>Father:</strong> {{ profile_user.profile.father.get_full_name|default:"Not provided" }}</li>
-                                    <li class="mb-2"><strong>Mother:</strong> {{ profile_user.profile.mother.get_full_name|default:"Not provided" }}</li>
+                                    <li class="mb-2"><strong>Father:</strong> 
+                                        {% if profile_user.profile.father %}
+                                            {{ profile_user.profile.father.user.get_full_name }}
+                                        {% else %}
+                                            Not provided
+                                        {% endif %}
+                                    </li>
+                                    <li class="mb-2"><strong>Mother:</strong> 
+                                        {% if profile_user.profile.mother %}
+                                            {{ profile_user.profile.mother.user.get_full_name }}
+                                        {% else %}
+                                            Not provided
+                                        {% endif %}
+                                    </li>
                                     <li class="mb-2"><strong>Has Children:</strong> {% if profile_user.profile.has_children %}Yes{% else %}No{% endif %}</li>
                                     {% if profile_user.profile.has_children %}
                                     <li class="mb-2"><strong>Number of Children:</strong> {{ profile_user.profile.number_of_children }}</li>
