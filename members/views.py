@@ -210,7 +210,7 @@ def events_page(request):
         'event_data': event_data,
     }
     return render(request, 'events_page.html', context)
-
+@login_required
 def contributions_page(request):
     selected_event = request.GET.get('event')
     events = Event.objects.all()
