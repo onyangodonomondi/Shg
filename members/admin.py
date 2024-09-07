@@ -61,7 +61,7 @@ class UserAdmin(BaseUserAdmin):
 # Re-register UserAdmin with custom profile inline
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-
+admin.site.register(Profile, ProfileAdmin)
 # Admin customization for Event
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -100,6 +100,11 @@ class ContributionAdmin(admin.ModelAdmin):
         return f"{obj.profile.user.first_name} {obj.profile.user.last_name}"
     get_profile_name.short_description = 'Profile Name'
 
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'father', 'mother')
+    search_fields = ('user__username', 'father__user__username', 'mother__user__username')
+    list_filter = ('user',)
+    raw_id_fields = ('father', 'mother')  # This makes it easier to search for users in a large database
 
 
 # Customizing the admin site titles
