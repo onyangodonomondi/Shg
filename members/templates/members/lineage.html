@@ -12,7 +12,7 @@
                 <!-- Display family trees -->
                 {% for parent_pair, descendants in families.items %}
                     <li class="d-flex flex-column align-items-center mb-4">
-                        <div class="profile-card text-center">
+                        <div class="profile-card text-center" style="width: 100%; max-width: 350px;"> <!-- Max-width for limiting on large screens -->
                             {% if parent_pair.0 and parent_pair.1 %}
                                 <!-- Couple -->
                                 <h4>{{ parent_pair.0.user.first_name }} & {{ parent_pair.1.user.first_name }}</h4>
@@ -37,10 +37,10 @@
                 <!-- Display individuals without a family tree -->
                 <div class="row">
                     {% for person in profiles.object_list %}
-                        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 d-flex justify-content-center">
                             <li>
-                                <div class="profile-card text-center">
-                                    <img src="{{ person.image.url }}" alt="{{ person.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px;">
+                                <div class="profile-card text-center" style="width: 100%; max-width: 350px;">
+                                    <img src="{{ person.image.url }}" alt="{{ person.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 80px; height: 80px;">
                                     <h4>{{ person.user.first_name }} {{ person.user.last_name }}</h4>
                                     <p><strong>Father:</strong> {% if person.father %}{{ person.father.user.first_name }} {{ person.father.user.last_name }}{% else %}Unknown{% endif %}</p>
                                     <p><strong>Mother:</strong> {% if person.mother %}{{ person.mother.user.first_name }} {{ person.mother.user.last_name }}{% else %}Unknown{% endif %}</p>
