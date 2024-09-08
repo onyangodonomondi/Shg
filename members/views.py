@@ -70,6 +70,7 @@ def get_children(profile, visited=None, depth=0, max_depth=10):
     if visited is None:
         visited = set()
 
+    # Avoid cycles and stop recursion if maximum depth is reached
     if profile in visited or depth > max_depth:
         return {}
 
@@ -81,8 +82,10 @@ def get_children(profile, visited=None, depth=0, max_depth=10):
     
     family_tree = {}
     
+    # Combine children from both father and mother relationships
     all_children = list(children_as_father) + list(children_as_mother)
     
+    # Recursively get the children's children
     for child in all_children:
         family_tree[child] = get_children(child, visited, depth + 1, max_depth)
     
@@ -93,27 +96,34 @@ def get_couples_with_children():
     Identify all couples who are parents (both father and mother) of the same children and treat them as the top of the family tree.
     """
     # Get all profiles where both a father and mother are set
-    couples = []
+    couples = set()  # Use a set to ensure uniqueness
     children_with_both_parents = Profile.objects.filter(father__isnull=False, mother__isnull=False)
-    
+
     for child in children_with_both_parents:
         father = child.father
         mother = child.mother
+        # Only add the couple if they haven't been added already
         if (father, mother) not in couples and (mother, father) not in couples:
-            # Add the couple as a tuple if they haven't been added already
-            couples.append((father, mother))
+            couples.add((father, mother))
     
     return couples
 
 def lineage_view(request):
+    # Track profiles that have been processed to avoid duplicating trees
+    processed_profiles = set()
+
     # Identify couples who are both parents of the same children and should be at the top
     couples = get_couples_with_children()
 
     # Build family trees for couples
     families = {}
     for father, mother in couples:
-        # Consider the father as the primary and get children from this relationship
-        families[(father, mother)] = get_children(father)
+        # Consider the father and mother as a unit
+        if father not in processed_profiles and mother not in processed_profiles:
+            families[(father, mother)] = get_children(father)
+            # Mark both father and mother as processed
+            processed_profiles.add(father)
+            processed_profiles.add(mother)
 
     # Fetch individuals with unknown father and mother and no descendants
     unknown_parents_no_descendants = Profile.objects.filter(father=None, mother=None).select_related('user', 'mother', 'father')
@@ -130,9 +140,11 @@ def lineage_view(request):
         or Profile.objects.filter(mother=profile).exists()
     ]
 
-    # Add family trees for individuals with unknown parents but descendants
+    # Add family trees for individuals with unknown parents but descendants, only if they haven't been processed
     for profile in unknown_parents_with_descendants:
-        families[profile] = get_children(profile)
+        if profile not in processed_profiles:
+            families[profile] = get_children(profile)
+            processed_profiles.add(profile)
 
     # Combine profiles: first the ones with no descendants on a single page, then the family trees on other pages
     all_profiles = no_descendants + list(families.items())
@@ -153,15 +165,6 @@ def lineage_view(request):
         'families': families if isinstance(paginated_profiles.object_list[0], tuple) else None  # Show families only for those pages
     }
     return render(request, 'members/lineage.html', context)
-def profile_detail(request, pk):
-    profile = get_object_or_404(Profile, pk=pk)
-    siblings = profile.get_siblings()
-    context = {
-        'profile': profile,
-        'siblings': siblings,
-    }
-    return render(request, 'profile_detail.html', context)
-
 @user_passes_test(lambda u: u.is_staff)
 def manage_contributions(request):
     if request.method == 'POST':
