@@ -186,35 +186,40 @@ def update_profile(request):
 
 from django.core.paginator import Paginator
 
+from django.shortcuts import render
+from django.db.models import Sum, Count
+from .models import Event, Contribution, Profile
+
+from django.core.paginator import Paginator
+
 def events_page(request):
-    # Fetch all events, both active and finished
     events = Event.objects.all()
-    total_members = Profile.objects.count()
-
+    
     event_data = []
-
     for event in events:
         total_contributed = Contribution.objects.filter(event=event).aggregate(Sum('amount'))['amount__sum'] or 0
-        percentage_contributed = (total_contributed / event.required_amount) * 100 if event.required_amount > 0 else 0
         contributor_count = Contribution.objects.filter(event=event).aggregate(Count('profile', distinct=True))['profile__count'] or 0
 
         event_data.append({
             'name': event.name,
             'date': event.date,
             'total_contributed': total_contributed,
-            'percentage_contributed': percentage_contributed,
             'contributor_count': contributor_count,
-            'total_members': total_members,
-            'is_active': event.is_active,
+            'is_active': event.is_active
         })
 
-    # Add pagination (5 events per page)
-    paginator = Paginator(event_data, 5)  # Display 5 events per page
+    # Paginate the event data (5 events per page)
+    paginator = Paginator(event_data, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'page_obj': page_obj,  # Pass the page object to the template
+        'page_obj': page_obj,
+        'events': event_data,  # Pass event data to the template
+        'total_events': len(events),
+        'active_events': len([event for event in events if event.is_active]),
+        'total_contributions': sum([e['total_contributed'] for e in event_data]),
+        'total_contributors': sum([e['contributor_count'] for e in event_data]),
     }
     return render(request, 'events_page.html', context)
 

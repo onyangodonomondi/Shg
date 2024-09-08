@@ -1,46 +1,92 @@
 {% extends 'base.html' %}
 
-{% block title %}Events{% endblock %}
+{% block title %}Events Analysis{% endblock %}
 
 {% block content %}
-<h1 class="text-center mb-5">Events</h1>
+<div class="container mt-5">
+    <h1 class="text-center mb-5">Events Analysis</h1>
 
-<div class="container">
-    <div class="row">
-        <!-- Loop through the events and display them as cards -->
-        {% for event in page_obj %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 {% if event.is_active %}border-success{% else %}border-secondary{% endif %}">
+    <!-- Cards Section for Event Stats -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-center shadow-lg p-3">
                 <div class="card-body">
-                    <h5 class="card-title">{{ event.name }}</h5>
-                    <p class="card-text">
-                        <strong>Status:</strong> 
-                        {% if event.is_active %}
-                        <span class="text-success">Active</span>
-                        {% else %}
-                        <span class="text-secondary">Finished</span>
-                        {% endif %}
-                    </p>
-                    <p class="card-text"><strong>Total Contributions:</strong> {{ event.total_contributed|floatformat:2 }} Ksh</p>
-                    <p class="card-text"><strong>Percentage Contributed:</strong> {{ event.percentage_contributed|floatformat:2 }}%</p>
-                    <p class="card-text"><strong>Contributors:</strong> {{ event.contributor_count }}</p>
-                    <p class="card-text"><strong>Members:</strong> {{ event.total_members }}</p>
-                </div>
-                <div class="card-footer text-center">
-                    <small class="text-muted">Event Date: {{ event.date|date:"M d, Y" }}</small>
+                    <h5>Total Events</h5>
+                    <h3>{{ total_events }}</h3>
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12 text-center">
-            <p>No events available at the moment.</p>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-center shadow-lg p-3">
+                <div class="card-body">
+                    <h5>Active Events</h5>
+                    <h3>{{ active_events }}</h3>
+                </div>
+            </div>
         </div>
-        {% endfor %}
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-center shadow-lg p-3">
+                <div class="card-body">
+                    <h5>Total Contributions</h5>
+                    <h3>{{ total_contributions }} Ksh</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card text-center shadow-lg p-3">
+                <div class="card-body">
+                    <h5>Number of Contributors</h5>
+                    <h3>{{ total_contributors }}</h3>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Pagination Controls -->
-    <div class="row">
-        <div class="col-12">
+    <!-- Row for Enlarged Bar Chart -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10 mb-4">
+            <canvas id="eventStateChart" class="shadow-lg rounded" style="height: 400px; width: 100%;"></canvas>
+        </div>
+    </div>
+
+    <!-- Table for Detailed Data with Pagination -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-12">
+            <h4 class="text-center mb-4">Event Contribution Data</h4>
+
+            <!-- Responsive Table -->
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered shadow-lg rounded table-striped mb-5">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Event</th>
+                            <th>Date</th>
+                            <th>Total Contributions</th>
+                            <th>Contributors</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in page_obj %}
+                        <tr>
+                            <td>{{ event.name }}</td>
+                            <td>{{ event.date|date:"M d, Y" }}</td>
+                            <td>{{ event.total_contributed|floatformat:2 }} Ksh</td>
+                            <td>{{ event.contributor_count }}</td>
+                            <td>
+                                {% if event.is_active %}
+                                <span class="badge bg-success">Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Finished</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
             <nav aria-label="Page navigation">
                 <ul class="pagination justify-content-center">
                     {% if page_obj.has_previous %}
@@ -52,9 +98,11 @@
                     {% endif %}
 
                     {% for num in page_obj.paginator.page_range %}
-                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                    </li>
+                    {% if page_obj.number == num %}
+                    <li class="page-item active"><a class="page-link">{{ num }}</a></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
                     {% endfor %}
 
                     {% if page_obj.has_next %}
@@ -69,4 +117,131 @@
         </div>
     </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script>
+    const barCtx = document.getElementById('eventStateChart').getContext('2d');
+    const eventStateChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for event in events %}"{{ event.name }}", {% endfor %}],
+            datasets: [{
+                label: 'Contributions (Ksh)',
+                data: [{% for event in events %}{{ event.total_contributed|floatformat:2 }}, {% endfor %}],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.6)',
+                    'rgba(54, 162, 235, 0.6)',
+                    'rgba(255, 206, 86, 0.6)',
+                    'rgba(75, 192, 192, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: true,
+                        borderDash: [2, 5]
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + ' Ksh'; // Add Ksh suffix to y-axis labels
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += new Intl.NumberFormat().format(context.raw) + ' Ksh';
+                            return label;
+                        }
+                    }
+                },
+                datalabels: {
+                    display: true,
+                    align: 'end',
+                    anchor: 'end',
+                    color: '#000',
+                    font: {
+                        weight: 'bold'
+                    },
+                    formatter: (value) => value + ' Ksh'
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeOutBounce'
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
+
+<!-- Custom CSS for Styling -->
+<style>
+    .card {
+        background-color: #fff;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge {
+        font-size: 1rem;
+        padding: 0.5rem;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .table thead {
+        background-color: #e9ecef;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+    
+    .table {
+        border-collapse: separate;
+        border-spacing: 0 0.5rem;
+        width: 100%;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #494949;
+        border-color: #b8b8b8;
+    }
+
+    .pagination .page-link {
+        padding: 10px;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #e9ecef;
+    }
+</style>
 {% endblock %}
