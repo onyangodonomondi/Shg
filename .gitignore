@@ -75,4 +75,6 @@ requirements.txt
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
+staticfiles/images/
+static/images/
 
