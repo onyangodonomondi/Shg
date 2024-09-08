@@ -16,6 +16,7 @@ urlpatterns = [
     path('register/', views.signup, name='register_member'),
     path('profile/<int:user_id>/', views.profile, name='profile'),
     path('profile/update/', views.update_profile, name='update_profile'),
+    path('members/login/', auth_views.LoginView.as_view(), name='login'),
 
     # Contributions
     path('contributions/', views.contributions_page, name='contributions_page'),
