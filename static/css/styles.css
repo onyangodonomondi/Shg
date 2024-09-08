@@ -724,3 +724,108 @@ img.rounded-circle {
     border: 2px solid #ddd;
     padding: 5px;
 }
+
+.card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+}
+
+.text-success {
+    font-weight: bold;
+}
+
+.text-secondary {
+    font-weight: bold;
+}
+
+/* Card container styling */
+.card {
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    padding: 20px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Card headers */
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Status */
+.text-success {
+    color: #27ae60;
+    /* A bright green for active events */
+}
+
+.text-secondary {
+    color: #95a5a6;
+    /* A muted gray for finished events */
+}
+
+/* Card footer */
+.card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+/* Pagination styling */
+.pagination .page-item.active .page-link {
+    background-color: #2980b9;
+    border-color: #2980b9;
+}
+
+.pagination .page-link {
+    color: #2980b9;
+}
+
+.pagination .page-link:hover {
+    background-color: #3498db;
+    border-color: #3498db;
+    color: #ffffff;
+}
+
+/* Special borders for active/finished events */
+.border-success {
+    border: 2px solid #27ae60;
+}
+
+.border-secondary {
+    border: 2px solid #95a5a6;
+}
+
+/* Custom fonts and styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f9;
+}
+
+h1 {
+    font-weight: bold;
+    color: #34495e;
+}
+
+.container {
+    max-width: 1200px;
+}
+
+.card-text {
+    font-size: 1rem;
+}
