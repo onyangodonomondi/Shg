@@ -3,16 +3,16 @@
 {% block title %}Family Lineage{% endblock %}
 
 {% block content %}
-<div class="container mt-4 mb-5"> <!-- Added mb-5 for bottom spacing -->
+<div class="container mt-4 mb-5">
     <h1 class="text-center">Family Lineage Hierarchy</h1>
 
     <div class="family-tree">
-        <ul>
+        <ul class="list-unstyled">
             {% if families %}
                 <!-- Display family trees -->
                 {% for parent_pair, descendants in families.items %}
-                    <li>
-                        <div class="profile-card">
+                    <li class="d-flex flex-column align-items-center mb-4">
+                        <div class="profile-card text-center">
                             {% if parent_pair.0 and parent_pair.1 %}
                                 <!-- Couple -->
                                 <h4>{{ parent_pair.0.user.first_name }} & {{ parent_pair.1.user.first_name }}</h4>
@@ -27,7 +27,7 @@
                         </div>
 
                         {% if descendants %}
-                            <ul>
+                            <ul class="list-unstyled d-flex flex-wrap justify-content-center">
                                 {% include 'members/lineage_tree.html' with families=descendants %}
                             </ul>
                         {% endif %}
@@ -35,22 +35,26 @@
                 {% endfor %}
             {% else %}
                 <!-- Display individuals without a family tree -->
-                {% for person in profiles.object_list %}
-                    <li>
-                        <div class="profile-card">
-                            <img src="{{ person.image.url }}" alt="{{ person.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px;">
-                            <h4>{{ person.user.first_name }} {{ person.user.last_name }}</h4>
-                            <p><strong>Father:</strong> {% if person.father %}{{ person.father.user.first_name }} {{ person.father.user.last_name }}{% else %}Unknown{% endif %}</p>
-                            <p><strong>Mother:</strong> {% if person.mother %}{{ person.mother.user.first_name }} {{ person.mother.user.last_name }}{% else %}Unknown{% endif %}</p>
+                <div class="row">
+                    {% for person in profiles.object_list %}
+                        <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                            <li>
+                                <div class="profile-card text-center">
+                                    <img src="{{ person.image.url }}" alt="{{ person.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px;">
+                                    <h4>{{ person.user.first_name }} {{ person.user.last_name }}</h4>
+                                    <p><strong>Father:</strong> {% if person.father %}{{ person.father.user.first_name }} {{ person.father.user.last_name }}{% else %}Unknown{% endif %}</p>
+                                    <p><strong>Mother:</strong> {% if person.mother %}{{ person.mother.user.first_name }} {{ person.mother.user.last_name }}{% else %}Unknown{% endif %}</p>
+                                </div>
+                            </li>
                         </div>
-                    </li>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             {% endif %}
         </ul>
     </div>
 
     <!-- Pagination controls -->
-    <div class="pagination mt-4"> <!-- Added mt-4 for space above pagination -->
+    <div class="pagination mt-4">
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
                 {% if profiles.has_previous %}

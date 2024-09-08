@@ -320,13 +320,14 @@ html {
 
 .btn-primary {
     color: #fff;
-    background-color: #007bff;
+    background-color: #aaaaaa;
     border-color: #007bff;
 }
 
+
 .btn-primary:hover {
     color: #fff;
-    background-color: #0069d9;
+    background-color: #bdbdbd;
     border-color: #0062cc;
 }
 
@@ -788,16 +789,17 @@ img.rounded-circle {
 
 /* Pagination styling */
 .pagination .page-item.active .page-link {
-    background-color: #2980b9;
-    border-color: #2980b9;
+    background-color: #dddddd;
+    border-color: #272727;
 }
 
 .pagination .page-link {
-    color: #2980b9;
+
+    color: #161616;
 }
 
 .pagination .page-link:hover {
-    background-color: #3498db;
+    background-color: #d1d1d1;
     border-color: #3498db;
     color: #ffffff;
 }
