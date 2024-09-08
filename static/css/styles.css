@@ -829,38 +829,3 @@ h1 {
 .card-text {
     font-size: 1rem;
 }
-
-.pagination {
-    margin-top: 20px;
-}
-
-.pagination .page-item .page-link {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    color: #007bff;
-    padding: 10px 20px;
-    font-size: 1rem;
-}
-
-.pagination .page-item.active .page-link {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: white;
-}
-
-.pagination .page-link:hover {
-    background-color: #e9ecef;
-    color: #0056b3;
-}
-
-.pagination .page-item:first-child .page-link,
-.pagination .page-item:last-child .page-link {
-    border-radius: 50%;
-    padding: 10px;
-}
-
-.pagination .page-item.disabled .page-link {
-    background-color: #f8f9fa;
-    border-color: #dee2e6;
-    color: #6c757d;
-}
