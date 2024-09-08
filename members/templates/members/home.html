@@ -55,7 +55,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for contribution in page_obj.object_list %}
+                                    {% for contribution in page_obj %}
                                     <tr onclick="showMemberDetails('{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}', '{{ contribution.profile.user.email }}', '{{ contribution.total_contributions }}', '{{ contribution.event_count }}', '{{ contribution.amount }}', '{% if contribution.profile.image %}{{ contribution.profile.image.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}')">
                                         <td>{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}</td>
                                         <td>{{ contribution.event.name }}</td>
@@ -125,18 +125,32 @@
     </div>
 </div>
 
+<!-- JavaScript for auto-updating member details every second -->
 <script>
-function showMemberDetails(name, email, totalContributions, eventCount, totalAmount, profilePicUrl) {
-    // Update the top section with the clicked member's details
-    document.getElementById("member-name").innerText = name;
-    document.getElementById("member-email").innerText = "Email: " + email;
-    document.getElementById("member-contributions").innerText = "Total Contributions: Ksh " + totalContributions;
-    document.getElementById("total-events").innerText = eventCount;
-    document.getElementById("total-amount").innerText = "Ksh " + totalAmount;
-    
-    // Update profile picture with the selected member's picture
-    document.getElementById("profile-pic").src = profilePicUrl;
+function updateMemberDetails() {
+    fetch('/member-contributions-json/')
+    .then(response => response.json())
+    .then(data => {
+        // Debug output to check received data
+        console.log(data);
+
+        // Update the member details on the page
+        document.getElementById("member-name").innerText = data.name;
+        document.getElementById("member-email").innerText = "Email: " + data.email;
+        document.getElementById("member-contributions").innerText = "Total Contributions: Ksh " + parseFloat(data.total_contributions).toFixed(2);
+        document.getElementById("total-events").innerText = data.event_count;
+        document.getElementById("total-amount").innerText = "Ksh " + parseFloat(data.total_amount).toFixed(2);
+
+        // Update profile picture with the selected member's picture
+        document.getElementById("profile-pic").src = data.profile_pic;
+    })
+    .catch(error => {
+        console.error('Error fetching member data:', error);
+    });
 }
+
+// Call the update function every 1.5 seconds
+setInterval(updateMemberDetails, 1500);
 </script>
 
 {% endblock %}

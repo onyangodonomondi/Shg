@@ -22,7 +22,8 @@ from django.shortcuts import render
 from django.db.models import Sum, Count
 from .models import Contribution, Event
 from django.core.paginator import Paginator
-
+from django.http import JsonResponse
+from random import choice
 def home(request):
     # Fetch all contributions
     contributions = Contribution.objects.all()
@@ -365,3 +366,38 @@ def export_contributions_excel(request):
     return response
 def some_view(request):
     return redirect(reverse('login'))
+
+def member_contributions_json(request):
+    # Get all profiles
+    profiles = Profile.objects.all()
+
+    if profiles.exists():
+        selected_member = choice(profiles)
+        contributions = Contribution.objects.filter(profile=selected_member)
+
+        total_contributions = contributions.aggregate(Sum('amount'))['amount__sum'] or 0
+        event_count = contributions.values('event').distinct().count()
+
+        # Debugging output
+        print(f"Selected member: {selected_member.user.first_name} {selected_member.user.last_name}")
+        print(f"Total contributions: {total_contributions}, Event count: {event_count}")
+
+        data = {
+            'name': f'{selected_member.user.first_name} {selected_member.user.last_name}',
+            'email': selected_member.user.email,
+            'total_contributions': total_contributions,
+            'event_count': event_count,
+            'total_amount': total_contributions,
+            'profile_pic': selected_member.image.url if selected_member.image else '/static/images/default_profile.jpg',
+        }
+    else:
+        data = {
+            'name': 'No Members Available',
+            'email': 'N/A',
+            'total_contributions': 0,
+            'event_count': 0,
+            'total_amount': 0,
+            'profile_pic': '/static/images/default_profile.jpg',
+        }
+
+    return JsonResponse(data)

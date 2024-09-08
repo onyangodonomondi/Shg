@@ -2,11 +2,13 @@ from django.urls import path
 from . import views
 from .views import CustomPasswordResetView, CustomLoginView, manage_events, manage_contributions
 from django.contrib.auth import views as auth_views
+from .views import member_contributions_json
 
 urlpatterns = [
     # Home Page
     path('', views.home, name='home'),
     path('lineage/', views.lineage_view, name='lineage'),
+    path('member-contributions-json/', member_contributions_json, name='member_contributions_json'),
 
     # Event Management
     path('events/', views.events_page, name='events_page'),
