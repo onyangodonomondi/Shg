@@ -3,7 +3,7 @@
 {% block title %}Family Lineage{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 mb-5"> <!-- Added mb-5 for bottom spacing -->
     <h1 class="text-center">Family Lineage Hierarchy</h1>
 
     <div class="family-tree">
@@ -50,7 +50,7 @@
     </div>
 
     <!-- Pagination controls -->
-    <div class="pagination">
+    <div class="pagination mt-4"> <!-- Added mt-4 for space above pagination -->
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
                 {% if profiles.has_previous %}
