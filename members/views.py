@@ -62,31 +62,73 @@ def home(request):
 
     return render(request, 'members/home.html', {'page_obj': page_obj})
 
-def get_children(profile):
+def get_children(profile, visited=None, depth=0, max_depth=10):
     """
-    Recursive function to get all descendants of a profile.
+    Recursive function to get all descendants of a profile, checking both father and mother.
+    Tracks visited profiles to avoid cycles and limits the recursion depth.
     """
-    children = Profile.objects.filter(father=profile)
+    # Initialize visited set
+    if visited is None:
+        visited = set()
+
+    # Stop recursion if the profile has already been visited or depth limit is reached
+    if profile in visited or depth > max_depth:
+        return {}
+
+    # Mark this profile as visited
+    visited.add(profile)
+
+    # Get children where either father or mother matches the current profile
+    children_as_father = Profile.objects.filter(father=profile)
+    children_as_mother = Profile.objects.filter(mother=profile)
+    
     family_tree = {}
-    for child in children:
-        family_tree[child] = get_children(child)  # Recursively get the children's children
+    
+    # Combine children from both father and mother relationships
+    all_children = list(children_as_father) + list(children_as_mother)
+    
+    for child in all_children:
+        family_tree[child] = get_children(child, visited, depth + 1, max_depth)  # Recursively get the children's children
+    
     return family_tree
 
 def lineage_view(request):
-    # Fetch all top-level profiles (those with no father)
-    top_profiles = Profile.objects.filter(father=None).select_related('user', 'mother')
+    # Fetch individuals without any family tree (i.e., no father and no children)
+    top_profiles = Profile.objects.filter(father=None, mother=None).select_related('user', 'mother', 'father')
+    people_without_family_tree = [
+        profile for profile in top_profiles 
+        if not Profile.objects.filter(father=profile).exists() 
+        and not Profile.objects.filter(mother=profile).exists()
+    ]
 
+    # Group profiles who have children
     families = {}
-    for profile in top_profiles:
-        # Build the family tree for each top-level individual recursively
-        families[profile] = get_children(profile)
+    top_profiles_with_parents = Profile.objects.filter(father=None, mother=None)  # Adjust to fetch top-level profiles
+    for profile in top_profiles_with_parents:
+        if profile not in people_without_family_tree:  # Only group those who have children
+            families[profile] = get_children(profile)
+
+    # Paginate the people without a family tree and the family trees separately
+    all_profiles = people_without_family_tree + list(families.items())
+
+    paginator = Paginator(all_profiles, 1)  # Show 1 person or family tree per page
+
+    page = request.GET.get('page', 1)
+
+    try:
+        paginated_profiles = paginator.page(page)
+    except PageNotAnInteger:
+        paginated_profiles = paginator.page(1)
+    except EmptyPage:
+        paginated_profiles = paginator.page(paginator.num_pages)
 
     context = {
-        'families': families,
+        'profiles': paginated_profiles,
+        'families': families if isinstance(paginated_profiles.object_list[0], tuple) else None  # Show families only for those pages
     }
     return render(request, 'members/lineage.html', context)
 
-    
+
 def profile_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
     siblings = profile.get_siblings()

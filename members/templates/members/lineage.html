@@ -8,24 +8,67 @@
 
     <div class="family-tree">
         <ul>
-            {% for parent, descendants in families.items %}
-                <li>
-                    <div class="profile-card">
-                        <img src="{{ parent.image.url }}" alt="{{ parent.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px;">
-                        <h4>{{ parent.user.first_name }} {{ parent.user.last_name }}</h4>
-                        <p><strong>Father:</strong> {% if parent.father %}{{ parent.father.user.first_name }} {{ parent.father.user.last_name }}{% else %}Unknown{% endif %}</p>
-                        <p><strong>Mother:</strong> {% if parent.mother %}{{ parent.mother.user.first_name }} {{ parent.mother.user.last_name }}{% else %}Unknown{% endif %}</p>
-                    </div>
+            {% if families %}
+                <!-- Display family trees -->
+                {% for parent, descendants in families.items %}
+                    <li>
+                        <div class="profile-card">
+                            <img src="{{ parent.image.url }}" alt="{{ parent.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px;">
+                            <h4>{{ parent.user.first_name }} {{ parent.user.last_name }}</h4>
+                            <p><strong>Father:</strong> {% if parent.father %}{{ parent.father.user.first_name }} {{ parent.father.user.last_name }}{% else %}Unknown{% endif %}</p>
+                            <p><strong>Mother:</strong> {% if parent.mother %}{{ parent.mother.user.first_name }} {{ parent.mother.user.last_name }}{% else %}Unknown{% endif %}</p>
+                        </div>
 
-                    <!-- Include the recursive part -->
-                    {% if descendants %}
-                        <ul>
-                            {% include 'members/lineage_tree.html' with families=descendants %}
-                        </ul>
-                    {% endif %}
-                </li>
-            {% endfor %}
+                        {% if descendants %}
+                            <ul>
+                                {% include 'members/lineage_tree.html' with families=descendants %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            {% else %}
+                <!-- Display individuals without a family tree -->
+                {% for person in profiles.object_list %}
+                    <li>
+                        <div class="profile-card">
+                            <img src="{{ person.image.url }}" alt="{{ person.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 100px; height: 100px;">
+                            <h4>{{ person.user.first_name }} {{ person.user.last_name }}</h4>
+                            <p><strong>Father:</strong> {% if person.father %}{{ person.father.user.first_name }} {{ person.father.user.last_name }}{% else %}Unknown{% endif %}</p>
+                            <p><strong>Mother:</strong> {% if person.mother %}{{ person.mother.user.first_name }} {{ person.mother.user.last_name }}{% else %}Unknown{% endif %}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            {% endif %}
         </ul>
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="pagination">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if profiles.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ profiles.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for i in profiles.paginator.page_range %}
+                    <li class="page-item {% if profiles.number == i %}active{% endif %}">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                {% endfor %}
+
+                {% if profiles.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ profiles.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
 </div>
 {% endblock %}
