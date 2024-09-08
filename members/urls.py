@@ -16,7 +16,6 @@ urlpatterns = [
     path('register/', views.signup, name='register_member'),
     path('profile/<int:user_id>/', views.profile, name='profile'),
     path('profile/update/', views.update_profile, name='update_profile'),
-    path('members/login/', auth_views.LoginView.as_view(), name='login'),
 
     # Contributions
     path('contributions/', views.contributions_page, name='contributions_page'),
@@ -30,7 +29,7 @@ urlpatterns = [
     path('members/', views.members_page, name='members'),
 
     # Authentication URLs
-    path('login/', CustomLoginView.as_view(), name='login'),
+    path('login/', CustomLoginView.as_view(), name='login'),  # Correct login path
     path('logout/', auth_views.LogoutView.as_view(template_name='logout.html'), name='logout'),
     path('signup/', views.signup, name='signup'),
 

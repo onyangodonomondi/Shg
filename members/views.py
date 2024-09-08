@@ -358,3 +358,5 @@ def export_contributions_excel(request):
     response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=contributions.xlsx'
     return response
+def some_view(request):
+    return redirect(reverse('login'))
