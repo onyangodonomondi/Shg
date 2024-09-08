@@ -184,14 +184,15 @@ def update_profile(request):
 
     return render(request, 'members/update_profile.html', {'form': form})
 
+from django.core.paginator import Paginator
+
 def events_page(request):
-    # Fetch all active events
-    events = Event.objects.filter(is_active=True)
-    total_members = Profile.objects.count()  # Get total number of members
+    # Fetch all events, both active and finished
+    events = Event.objects.all()
+    total_members = Profile.objects.count()
 
     event_data = []
 
-    # Prepare the event data
     for event in events:
         total_contributed = Contribution.objects.filter(event=event).aggregate(Sum('amount'))['amount__sum'] or 0
         percentage_contributed = (total_contributed / event.required_amount) * 100 if event.required_amount > 0 else 0
@@ -199,17 +200,24 @@ def events_page(request):
 
         event_data.append({
             'name': event.name,
+            'date': event.date,
             'total_contributed': total_contributed,
             'percentage_contributed': percentage_contributed,
             'contributor_count': contributor_count,
-            'total_members': total_members,  # Include total members in the data
+            'total_members': total_members,
+            'is_active': event.is_active,
         })
 
-    # Render the page without any filters
+    # Add pagination (5 events per page)
+    paginator = Paginator(event_data, 5)  # Display 5 events per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'event_data': event_data,
+        'page_obj': page_obj,  # Pass the page object to the template
     }
     return render(request, 'events_page.html', context)
+
 @login_required
 def contributions_page(request):
     selected_event = request.GET.get('event')
