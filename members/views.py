@@ -93,23 +93,28 @@ def get_children(profile, visited=None, depth=0, max_depth=10):
     return family_tree
 
 def lineage_view(request):
-    # Fetch individuals without any family tree (i.e., no father and no children)
-    top_profiles = Profile.objects.filter(father=None, mother=None).select_related('user', 'mother', 'father')
-    people_without_family_tree = [
-        profile for profile in top_profiles 
+    # Fetch individuals with unknown father and mother and no descendants
+    unknown_parents_no_descendants = Profile.objects.filter(father=None, mother=None).select_related('user', 'mother', 'father')
+    no_descendants = [
+        profile for profile in unknown_parents_no_descendants 
         if not Profile.objects.filter(father=profile).exists() 
         and not Profile.objects.filter(mother=profile).exists()
     ]
 
-    # Group profiles who have children
-    families = {}
-    top_profiles_with_parents = Profile.objects.filter(father=None, mother=None)  # Adjust to fetch top-level profiles
-    for profile in top_profiles_with_parents:
-        if profile not in people_without_family_tree:  # Only group those who have children
-            families[profile] = get_children(profile)
+    # Fetch individuals with unknown father or mother but who have descendants
+    unknown_parents_with_descendants = [
+        profile for profile in unknown_parents_no_descendants
+        if Profile.objects.filter(father=profile).exists() 
+        or Profile.objects.filter(mother=profile).exists()
+    ]
 
-    # Paginate the people without a family tree and the family trees separately
-    all_profiles = people_without_family_tree + list(families.items())
+    # Create family trees for those with unknown parents but descendants
+    families = {}
+    for profile in unknown_parents_with_descendants:
+        families[profile] = get_children(profile)
+
+    # Combine profiles: first the ones with no descendants on a single page, then the family trees on other pages
+    all_profiles = no_descendants + list(families.items())
 
     paginator = Paginator(all_profiles, 1)  # Show 1 person or family tree per page
 
@@ -127,7 +132,6 @@ def lineage_view(request):
         'families': families if isinstance(paginated_profiles.object_list[0], tuple) else None  # Show families only for those pages
     }
     return render(request, 'members/lineage.html', context)
-
 
 def profile_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
