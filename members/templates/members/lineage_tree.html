@@ -1,0 +1,17 @@
+{% for parent, descendants in families.items %}
+    <li>
+        <div class="profile-card">
+            <img src="{{ parent.image.url }}" alt="{{ parent.user.first_name }}" class="img-fluid rounded-circle mb-2" style="width: 75px; height: 75px;">
+            <h5>{{ parent.user.first_name }} {{ parent.user.last_name }}</h5>
+            <p><strong>Father:</strong> {% if parent.father %}{{ parent.father.user.first_name }} {{ parent.father.user.last_name }}{% else %}Unknown{% endif %}</p>
+            <p><strong>Mother:</strong> {% if parent.mother %}{{ parent.mother.user.first_name }} {{ parent.mother.user.last_name }}{% else %}Unknown{% endif %}</p>
+        </div>
+
+        <!-- Recursively include the lineage_tree.html again -->
+        {% if descendants %}
+            <ul>
+                {% include 'members/lineage_tree.html' with families=descendants %}
+            </ul>
+        {% endif %}
+    </li>
+{% endfor %}

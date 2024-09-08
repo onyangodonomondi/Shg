@@ -62,27 +62,31 @@ def home(request):
 
     return render(request, 'members/home.html', {'page_obj': page_obj})
 
-def lineage_view(request):
-    # Get all profiles
-    profiles = Profile.objects.all()
+def get_children(profile):
+    """
+    Recursive function to get all descendants of a profile.
+    """
+    children = Profile.objects.filter(father=profile)
+    family_tree = {}
+    for child in children:
+        family_tree[child] = get_children(child)  # Recursively get the children's children
+    return family_tree
 
-    # Group profiles by their father
+def lineage_view(request):
+    # Fetch all top-level profiles (those with no father)
+    top_profiles = Profile.objects.filter(father=None).select_related('user', 'mother')
+
     families = {}
-    for profile in profiles:
-        # If no father, they are the top-most individuals
-        if profile.father is None:
-            families[profile] = []
-        else:
-            # Add children under their respective fathers
-            if profile.father not in families:
-                families[profile.father] = []
-            families[profile.father].append(profile)
+    for profile in top_profiles:
+        # Build the family tree for each top-level individual recursively
+        families[profile] = get_children(profile)
 
     context = {
         'families': families,
     }
     return render(request, 'members/lineage.html', context)
 
+    
 def profile_detail(request, pk):
     profile = get_object_or_404(Profile, pk=pk)
     siblings = profile.get_siblings()
