@@ -62,19 +62,46 @@ def home(request):
 
     return render(request, 'members/home.html', {'page_obj': page_obj})
 
+def get_children(profile, visited=None, depth=0, max_depth=10):
+    """
+    Recursive function to get all descendants of a profile, checking both father and mother.
+    Tracks visited profiles to avoid cycles and limits the recursion depth.
+    """
+    if visited is None:
+        visited = set()
+
+    if profile in visited or depth > max_depth:
+        return {}
+
+    visited.add(profile)
+
+    # Get children where either father or mother matches the current profile
+    children_as_father = Profile.objects.filter(father=profile)
+    children_as_mother = Profile.objects.filter(mother=profile)
+    
+    family_tree = {}
+    
+    all_children = list(children_as_father) + list(children_as_mother)
+    
+    for child in all_children:
+        family_tree[child] = get_children(child, visited, depth + 1, max_depth)
+    
+    return family_tree
+
 def get_couples_with_children():
     """
     Identify all couples who are parents (both father and mother) of the same children and treat them as the top of the family tree.
     """
-    couples = set()
+    # Get all profiles where both a father and mother are set
+    couples = []
     children_with_both_parents = Profile.objects.filter(father__isnull=False, mother__isnull=False)
     
     for child in children_with_both_parents:
         father = child.father
         mother = child.mother
-        # Only add the couple once, regardless of order
         if (father, mother) not in couples and (mother, father) not in couples:
-            couples.add((father, mother))
+            # Add the couple as a tuple if they haven't been added already
+            couples.append((father, mother))
     
     return couples
 
@@ -85,8 +112,8 @@ def lineage_view(request):
     # Build family trees for couples
     families = {}
     for father, mother in couples:
-        # Consider the couple as a unit and get children from this relationship
-        families[(father, mother)] = get_children(father)  # Assuming father and mother share the same children
+        # Consider the father as the primary and get children from this relationship
+        families[(father, mother)] = get_children(father)
 
     # Fetch individuals with unknown father and mother and no descendants
     unknown_parents_no_descendants = Profile.objects.filter(father=None, mother=None).select_related('user', 'mother', 'father')
