@@ -8,23 +8,25 @@
     <div class="row">
         <!-- Profile Sidebar for User Image and Actions -->
         <div class="col-md-4">
-            <div class="card profile-card mb-4 shadow-sm">
-                {% if profile_user.profile.image %}
-                <img src="{{ profile_user.profile.image.url }}" alt="Profile Picture" class="card-img-top rounded-circle mx-auto d-block profile-image" style="width: 140px; height: 140px; margin-top: -70px;">
-                {% else %}
-                <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="card-img-top rounded-circle mx-auto d-block profile-image" style="width: 140px; height: 140px; margin-top: -70px;">
-                {% endif %}
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ profile_user.get_full_name }}</h5>
-                    <p class="card-text">{{ greeting_message }}</p>
-                    <a href="{% url 'update_profile' %}" class="btn btn-sm btn-primary">Edit Profile</a>
+            <div class="card profile-card mb-4 shadow-sm text-center p-4" style="max-width: 300px; margin: 0 auto;">
+                <div class="card-body d-flex flex-column align-items-center">
+                    {% if profile_user.profile.image %}
+                    <img src="{{ profile_user.profile.image.url }}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 120px; height: 120px;">
+                    {% else %}
+                    <img src="{% static 'default.jpg' %}" alt="Profile Picture" class="rounded-circle mb-3" style="width: 120px; height: 120px;">
+                    {% endif %}
+                    <h5 class="card-title mb-2 text-center" style="font-size: 1.3rem;">
+                        {{ profile_user.get_full_name }}
+                    </h5>
+                    <p class="text-muted">{{ greeting_message }}</p>
+                    <a href="{% url 'update_profile' %}" class="btn btn-primary btn-sm mt-2">Edit Profile</a>
                 </div>
             </div>
         </div>
 
         <!-- User Info Section -->
         <div class="col-md-8">
-            <div class="card p-4 shadow-sm">
+            <div class="card shadow-sm p-4">
                 <ul class="nav nav-tabs" id="profileTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="about-tab" data-bs-toggle="tab" data-bs-target="#about" type="button" role="tab" aria-controls="about" aria-selected="true">About</button>
@@ -33,88 +35,101 @@
                         <button class="nav-link" id="contributions-tab" data-bs-toggle="tab" data-bs-target="#contributions" type="button" role="tab" aria-controls="contributions" aria-selected="false">Contributions</button>
                     </li>
                 </ul>
-                <div class="tab-content" id="profileTabsContent">
+                <div class="tab-content p-4" id="profileTabsContent">
+                    <!-- About Tab -->
                     <div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="about-tab">
-                        <h3 class="mt-3">Bio</h3>
+                        <h4 class="section-title">Bio</h4>
                         <p>{{ profile_user.profile.bio|default:"No bio available" }}</p>
 
-                        <h3 class="mt-4">Contact Information</h3>
-                        <div class="card mt-4 shadow-sm">
-                            <div class="card-header bg-primary text-white text-center">
-                                <h4 class="mb-0">Contact Information</h4>
+                        <div class="row">
+                            <!-- Contact Information -->
+                            <div class="col-md-6 d-flex">
+                                <div class="card flex-fill mt-3 shadow-sm p-3 bg-light">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5>Contact Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2"><strong>Email:</strong> {{ profile_user.email }}</li>
+                                            <li class="mb-2"><strong>Phone:</strong> {{ profile_user.profile.phone_number|default:"Not provided" }}</li>
+                                            <li class="mb-2"><strong>Birthday:</strong> {{ profile_user.profile.birthdate|date:"d M, Y" }}</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled">
-                                    <li class="mb-2"><strong>Email:</strong> {{ profile_user.email }}</li>
-                                    <li class="mb-2"><strong>Phone:</strong> {{ profile_user.profile.phone_number|default:"Not provided" }}</li>
-                                    <li class="mb-2"><strong>Birthday:</strong> {{ profile_user.profile.birthdate|date:"d M, Y" }}</li>
-                                </ul>
-                            </div>
-                        </div>
 
-                        <h3 class="mt-4">Family Information</h3>
-                        <div class="card mt-4 shadow-sm">
-                            <div class="card-header bg-info text-white text-center">
-                                <h4 class="mb-0">Lineage Information</h4>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled">
-                                    <li class="mb-2"><strong>Father:</strong> 
-                                        {% if profile_user.profile.father %}
-                                            {{ profile_user.profile.father.user.get_full_name }}
-                                        {% else %}
-                                            Not provided
-                                        {% endif %}
-                                    </li>
-                                    <li class="mb-2"><strong>Mother:</strong> 
-                                        {% if profile_user.profile.mother %}
-                                            {{ profile_user.profile.mother.user.get_full_name }}
-                                        {% else %}
-                                            Not provided
-                                        {% endif %}
-                                    </li>
-                                    <li class="mb-2"><strong>Has Children:</strong> {% if profile_user.profile.has_children %}Yes{% else %}No{% endif %}</li>
-                                    {% if profile_user.profile.has_children %}
-                                    <li class="mb-2"><strong>Number of Children:</strong> {{ profile_user.profile.number_of_children }}</li>
-                                    {% endif %}
-                                </ul>
+                            <!-- Family Information -->
+                            <div class="col-md-6 d-flex">
+                                <div class="card flex-fill mt-3 shadow-sm p-3 bg-light">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5>Family Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled">
+                                            <li class="mb-2"><strong>Father:</strong> 
+                                                {% if profile_user.profile.father %}
+                                                    {{ profile_user.profile.father.user.get_full_name }}
+                                                {% else %}
+                                                    Not provided
+                                                {% endif %}
+                                            </li>
+                                            <li class="mb-2"><strong>Mother:</strong> 
+                                                {% if profile_user.profile.mother %}
+                                                    {{ profile_user.profile.mother.user.get_full_name }}
+                                                {% else %}
+                                                    Not provided
+                                                {% endif %}
+                                            </li>
+                                            <li class="mb-2"><strong>Has Children:</strong> {% if profile_user.profile.has_children %}Yes{% else %}No{% endif %}</li>
+                                            {% if profile_user.profile.has_children %}
+                                            <li class="mb-2"><strong>Number of Children:</strong> {{ profile_user.profile.number_of_children }}</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Contributions Tab -->
                     <div class="tab-pane fade" id="contributions" role="tabpanel" aria-labelledby="contributions-tab">
-                        <h3 class="mt-3">Your Contributions</h3>
+                        <h4 class="section-title">Your Contributions</h4>
                         {% if user_contributions %}
-                        <ul class="list-group mt-3">
-                            {% for contribution in user_contributions %}
-                            <li class="list-group-item">
-                                <strong>Event:</strong> {{ contribution.event.name }}<br>
-                                <strong>Amount:</strong> {{ contribution.amount }} Ksh<br>
-                                <strong>Status:</strong> 
-                                <span class="badge {% if contribution.category == 'Fully Contributed' %} bg-success {% else %} bg-warning {% endif %}">
-                                    {{ contribution.category }}
-                                </span>
-                            </li>
-                            {% endfor %}
-                        </ul>
+                        <div class="scrollable-contributions">
+                            <div class="row mt-3">
+                                {% for contribution in user_contributions %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card shadow-sm p-3 h-100">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <strong>Event:</strong> {{ contribution.event.name }}<br>
+                                                <strong>Amount:</strong> {{ contribution.amount }} Ksh
+                                            </div>
+                                            <div class="col text-end">
+                                                <span class="badge {% if contribution.category == 'Fully Contributed' %} bg-success {% else %} bg-warning {% endif %}">
+                                                    {{ contribution.category }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
                         {% else %}
                         <p class="mt-3">You have not made any contributions yet.</p>
                         {% endif %}
-                        <h3>Total Amount Contributed</h3>
-                        <p>Total: {{ total_contributed }} Ksh</p>
 
-                        <h3>Event Contribution Statistics</h3>
-                        <p>Total Members: {{ total_users }}</p>
-                        <ul class="list-group" style="max-height: 150px; overflow-y: auto;">
-                            {% for event in event_contribution_stats %}
-                            <li class="list-group-item">
-                                <strong>Event Name:</strong> {{ event.event_name }}<br>
-                                <strong>Total Contributed:</strong> {{ event.total_contributed }} Ksh<br>
-                                <strong>Contributors:</strong> {{ event.contributors_count }} contributors
-                            </li>
-                            {% endfor %}
-                        </ul>
+                        <!-- Styled Total Amount Contributed Section -->
+                        <div class="card mt-4 shadow-sm p-3">
+                            <div class="card-body text-center">
+                                <h5 class="section-title">Total Amount Contributed</h5>
+                                <p class="total-contributed-display">
+                                    <span class="total-amount">{{ total_contributed }} Ksh</span>
+                                </p>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -125,32 +140,43 @@
 <!-- Custom CSS -->
 <style>
     .profile-card {
-        padding-top: 40px;
-        background-color: #ffffff;
+        background-color: #f8f9fa;
         border-radius: 15px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        text-align: center;
+        width: 100%; 
     }
     .profile-image {
         object-fit: cover;
-        border: 3px solid #007bff;
-    }
-    .card-header {
-        background-color: #007bff;
-        color: white;
-        padding: 10px;
+        border: 2px solid #007bff;
     }
     .nav-tabs .nav-link.active {
         background-color: #007bff;
         color: #fff;
     }
-    .list-unstyled {
-        margin-bottom: 0;
-        padding-left: 0;
-        list-style: none;
+    .section-title {
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
     }
-    .list-group-item {
-        background-color: #f8f9fa;
+    .card-header {
+        background-color: #007bff;
+        color: white;
+    }
+    .scrollable-contributions {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    .total-contributed-display {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+    .total-amount {
+        font-size: 2rem;
+        color: #28a745;
+    }
+    .flex-fill {
+        flex: 1;
     }
 </style>
 {% endblock %}
