@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %} <!-- Load the static template tag -->
+{% load static %}
 
 {% block title %}Members{% endblock %}
 
@@ -52,6 +52,22 @@
         border-radius: 5px;
     }
 
+    .super-member {
+        background-color: #28a745 !important;
+    }
+
+    .quasi-member {
+        background-color: #ffc107 !important;
+    }
+
+    .dormant-member {
+        background-color: #dc3545 !important;
+    }
+
+    .active-member {
+        background-color: #007bff !important;
+    }
+
     .social-icons a {
         margin: 0 10px;
         font-size: 18px;
@@ -63,54 +79,44 @@
         color: #007bff;
     }
 
-    .team-mates {
-        display: flex;
-        justify-content: center;
-        margin-top: 10px;
-    }
-
-    .team-mates img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        margin-right: 5px;
-        border: 2px solid #fff;
-    }
-
-    .recent-activities {
-        font-size: 12px;
-        color: #777;
-        text-align: center;
-        margin-top: 10px;
-    }
-
-    .recent-activities i {
-        margin-right: 5px;
-    }
-
-    .profile-img-top {
-        width: 100%;
-        border-top-left-radius: 15px;
-        border-top-right-radius: 15px;
-    }
 </style>
 
 <div class="container">
     <div class="row">
-        {% for profile in profiles %}
+        {% for member in profiles %}
         <div class="col-md-4 col-lg-3 mb-4">
             <div class="card member-card">
                 <!-- Profile Picture -->
                 <div class="profile-info">
-                    <img src="{{ profile.image.url }}" class="img-fluid" alt="{{ profile.user.get_full_name }}">
+                    <img src="{{ member.profile.image.url }}" class="img-fluid" alt="{{ member.profile.user.get_full_name }}">
                     <!-- Member Name -->
-                    <h5>{{ profile.user.get_full_name|default:profile.user.first_name }}</h5>
+                    <h5>{{ member.profile.user.get_full_name|default:member.profile.user.first_name }}</h5>
                     <!-- Organization or description -->
-                    <p>{{ profile.bio|default:"No bio available" }}</p>
-                    <!-- Position or role -->
-                    <span class="badge">{{ profile.role|default:"Member" }}</span>
+                    <p>{{ member.profile.bio|default:"No bio available" }}</p>
 
-                    
+                    <!-- Member category (badge) -->
+                    <span class="badge 
+                        {% if member.category == 'Super Member' %} super-member
+                        {% elif member.category == 'QUASI Member' %} quasi-member
+                        {% elif member.category == 'Dormant' %} dormant-member
+                        {% elif member.category == 'Active Member' %} active-member
+                        {% endif %}
+                    ">
+                        {{ member.category }}
+                    </span>
+
+                    <!-- Social media icons (optional) -->
+                    <div class="social-icons mt-3">
+                        {% if member.profile.linkedin %}
+                        <a href="{{ member.profile.linkedin }}" target="_blank"><i class="fab fa-linkedin"></i></a>
+                        {% endif %}
+                        {% if member.profile.twitter %}
+                        <a href="{{ member.profile.twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                        {% endif %}
+                        {% if member.profile.website %}
+                        <a href="{{ member.profile.website }}" target="_blank"><i class="fas fa-globe"></i></a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

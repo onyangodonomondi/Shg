@@ -498,9 +498,47 @@ def members_page(request):
     # Fetch all profiles (members)
     profiles = Profile.objects.all()
 
-    # Optionally, you can paginate the members list if you have many members
-    from django.core.paginator import Paginator
-    paginator = Paginator(profiles, 10)  # Show 10 members per page
+    categorized_members = []
+
+    for profile in profiles:
+        # Fetch the last 2 contributions for the profile
+        contributions = Contribution.objects.filter(profile=profile).order_by('-event__date')[:2]
+
+        # Initialize the member status
+        missed_events = 0
+        partial_payments = 0
+        is_super_member = False
+        is_active_member = False
+
+        for contribution in contributions:
+            if contribution.amount == 0:
+                missed_events += 1
+            elif 0 < contribution.amount < contribution.event.required_amount:
+                partial_payments += 1
+            elif contribution.amount == contribution.event.required_amount:
+                is_active_member = True
+            elif contribution.amount > contribution.event.required_amount:
+                is_super_member = True
+
+        # Determine the member's badge category
+        if is_super_member:
+            category = "Super Member"
+        elif missed_events >= 2:
+            category = "Dormant"
+        elif partial_payments >= 2:
+            category = "QUASI Member"
+        elif is_active_member:
+            category = "Active Member"
+        else:
+            category = "Active Member"  # Default if none of the above conditions are met
+
+        categorized_members.append({
+            'profile': profile,
+            'category': category
+        })
+
+    # Paginate the categorized members
+    paginator = Paginator(categorized_members, 10)  # Show 10 members per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
