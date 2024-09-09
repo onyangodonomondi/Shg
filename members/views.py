@@ -495,7 +495,6 @@ def member_contributions_json(request):
     return JsonResponse(data)
 
 def members_page(request):
-    # Fetch all profiles (members)
     profiles = Profile.objects.all()
 
     categorized_members = []
@@ -537,6 +536,12 @@ def members_page(request):
             'category': category
         })
 
+    # Apply filter based on selected category from the GET request
+    selected_category = request.GET.get('category')
+
+    if selected_category:
+        categorized_members = [member for member in categorized_members if member['category'] == selected_category]
+
     # Paginate the categorized members
     paginator = Paginator(categorized_members, 10)  # Show 10 members per page
     page_number = request.GET.get('page')
@@ -544,5 +549,6 @@ def members_page(request):
 
     context = {
         'profiles': page_obj,  # Pass the paginated profiles to the template
+        'selected_category': selected_category,  # Pass the selected category for the filter dropdown
     }
     return render(request, 'members/members_page.html', context)
