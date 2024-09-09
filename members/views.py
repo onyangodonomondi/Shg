@@ -301,13 +301,19 @@ def events_page(request):
 def contributions_page(request):
     selected_event = request.GET.get('event')
     events = Event.objects.all()
+
     if selected_event:
         contributions = Contribution.objects.filter(event__name=selected_event)
     else:
         contributions = Contribution.objects.all()
 
+    # Paginate contributions (e.g., 10 per page)
+    paginator = Paginator(contributions, 10)  # Adjust the number as needed
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'contributions': contributions,
+        'contributions': page_obj,  # Update to use paginated contributions
         'events': events,
         'selected_event': selected_event,
     }
