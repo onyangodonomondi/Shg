@@ -1,38 +1,147 @@
 {% extends 'base.html' %}
+{% load static %} <!-- Load the static template tag -->
 
 {% block title %}Members{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="text-center mb-5">Members List</h1>
+<h1 class="text-center mb-4">Our Members</h1>
+
+<!-- Inline CSS for styling -->
+<style>
+    .member-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        background-color: #fff;
+        transition: all 0.3s ease-in-out;
+        padding: 20px;
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .member-card img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        margin-bottom: 15px;
+    }
+
+    .profile-info {
+        text-align: center;
+    }
+
+    .profile-info h5 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .profile-info p {
+        font-size: 14px;
+        color: #777;
+        margin-bottom: 5px;
+    }
+
+    .badge {
+        font-size: 12px;
+        padding: 5px 10px;
+        background-color: #6c757d;
+        color: #fff;
+        border-radius: 5px;
+    }
+
+    .social-icons a {
+        margin: 0 10px;
+        font-size: 18px;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .social-icons a:hover {
+        color: #007bff;
+    }
+
+    .team-mates {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .team-mates img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 5px;
+        border: 2px solid #fff;
+    }
+
+    .recent-activities {
+        font-size: 12px;
+        color: #777;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .recent-activities i {
+        margin-right: 5px;
+    }
+
+    .profile-img-top {
+        width: 100%;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+</style>
+
+<div class="container">
     <div class="row">
         {% for profile in profiles %}
-        <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-body text-center">
-                    <!-- Display Profile Image with fallback to a default image if not available -->
-                    {% if profile.image %}
-                    <img src="{{ profile.image.url }}" class="rounded-circle img-fluid mb-3" alt="{{ profile.user.get_full_name }}" style="width: 100px; height: 100px; object-fit: cover;">
-                    {% else %}
-                    <img src="{% static 'default.jpg' %}" class="rounded-circle img-fluid mb-3" alt="Default Image" style="width: 100px; height: 100px; object-fit: cover;">
-                    {% endif %}
+        <div class="col-md-4 col-lg-3 mb-4">
+            <div class="card member-card">
+                <!-- Profile Picture -->
+                <div class="profile-info">
+                    <img src="{{ profile.image.url }}" class="img-fluid" alt="{{ profile.user.get_full_name }}">
+                    <!-- Member Name -->
+                    <h5>{{ profile.user.get_full_name|default:profile.user.first_name }}</h5>
+                    <!-- Organization or description -->
+                    <p>{{ profile.bio|default:"No bio available" }}</p>
+                    <!-- Position or role -->
+                    <span class="badge">{{ profile.role|default:"Member" }}</span>
 
-                    <!-- Display Full Name -->
-                    <h5 class="card-title">{{ profile.user.get_full_name }}</h5>
-
-                    <!-- Display Bio or default message -->
-                    <p class="card-text">{{ profile.bio|default:"No bio available" }}</p>
-
-                    <!-- View Profile Button -->
-                    <a href="{% url 'profile' profile.user.id %}" class="btn btn-outline-primary">View Profile</a>
+                    
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="col-12">
-            <p class="text-center">No members found.</p>
-        </div>
+        <p class="text-center">No members available at the moment.</p>
         {% endfor %}
+    </div>
+
+    <!-- Pagination controls -->
+    <div class="d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if profiles.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ profiles.previous_page_number }}">&laquo;</a>
+                </li>
+                {% endif %}
+
+                {% for num in profiles.paginator.page_range %}
+                <li class="page-item {% if profiles.number == num %}active{% endif %}">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endfor %}
+
+                {% if profiles.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ profiles.next_page_number }}">&raquo;</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
 </div>
 {% endblock %}

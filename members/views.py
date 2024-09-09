@@ -493,3 +493,18 @@ def member_contributions_json(request):
         }
 
     return JsonResponse(data)
+
+def members_page(request):
+    # Fetch all profiles (members)
+    profiles = Profile.objects.all()
+
+    # Optionally, you can paginate the members list if you have many members
+    from django.core.paginator import Paginator
+    paginator = Paginator(profiles, 10)  # Show 10 members per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'profiles': page_obj,  # Pass the paginated profiles to the template
+    }
+    return render(request, 'members/members_page.html', context)
