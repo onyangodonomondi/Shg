@@ -24,6 +24,7 @@ from .models import Contribution, Event
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from random import choice
+from django.db.models import F
 def home(request):
     # Fetch all contributions
     contributions = Contribution.objects.all()
@@ -300,12 +301,24 @@ def events_page(request):
 @login_required
 def contributions_page(request):
     selected_event = request.GET.get('event')
+    selected_status = request.GET.get('status')  # Capture the selected status
     events = Event.objects.all()
 
+    # Base query for contributions
+    contributions = Contribution.objects.all()
+
+    # Filter by event if selected
     if selected_event:
-        contributions = Contribution.objects.filter(event__name=selected_event)
-    else:
-        contributions = Contribution.objects.all()
+        contributions = contributions.filter(event__name=selected_event)
+
+    # Filter by status if selected
+    if selected_status:
+        if selected_status == 'Fully Contributed':
+            contributions = contributions.filter(amount__gte=F('event__required_amount'))
+        elif selected_status == 'Partially Contributed':
+            contributions = contributions.filter(amount__lt=F('event__required_amount'), amount__gt=0)
+        elif selected_status == 'No Contribution':
+            contributions = contributions.filter(amount=0)
 
     # Paginate contributions (e.g., 10 per page)
     paginator = Paginator(contributions, 10)  # Adjust the number as needed
@@ -313,12 +326,12 @@ def contributions_page(request):
     page_obj = paginator.get_page(page_number)
 
     context = {
-        'contributions': page_obj,  # Update to use paginated contributions
+        'contributions': page_obj,
         'events': events,
         'selected_event': selected_event,
+        'selected_status': selected_status,  # Pass the selected status to the template
     }
     return render(request, 'contributions_page.html', context)
-
 def signup(request):
     if request.method == 'POST':
         form = UserSignUpForm(request.POST)

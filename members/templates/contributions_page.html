@@ -8,7 +8,8 @@
 <div class="container mb-4">
     <form method="get">
         <div class="row">
-            <div class="col-md-4">
+            <!-- Event Filter -->
+            <div class="col-md-3">
                 <select name="event" class="form-select" onchange="this.form.submit()">
                     <option value="">All Events</option>
                     {% for event in events %}
@@ -18,12 +19,30 @@
                     {% endfor %}
                 </select>
             </div>
+
+            <!-- Status Filter -->
+            <div class="col-md-3">
+                <select name="status" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <option value="Fully Contributed" {% if selected_status == 'Fully Contributed' %}selected{% endif %}>
+                        Fully Contributed
+                    </option>
+                    <option value="Partially Contributed" {% if selected_status == 'Partially Contributed' %}selected{% endif %}>
+                        Partially Contributed
+                    </option>
+                    <option value="No Contribution" {% if selected_status == 'No Contribution' %}selected{% endif %}>
+                        No Contribution
+                    </option>
+                </select>
+            </div>
+
+            <!-- Filter Button and Export Buttons -->
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary">Filter</button>
             </div>
-            <div class="col-md-6 text-end">
-                <a href="{% url 'export_contributions_pdf' %}?event={{ selected_event }}" class="btn btn-danger">Export to PDF</a>
-                <a href="{% url 'export_contributions_excel' %}?event={{ selected_event }}" class="btn btn-success">Export to Excel</a>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'export_contributions_pdf' %}?event={{ selected_event }}&status={{ selected_status }}" class="btn btn-danger">Export to PDF</a>
+                <a href="{% url 'export_contributions_excel' %}?event={{ selected_event }}&status={{ selected_status }}" class="btn btn-success">Export to Excel</a>
             </div>
         </div>
     </form>
@@ -42,7 +61,7 @@
         <tbody>
             {% for contribution in contributions %}
             <tr>
-                <!-- Updated to fetch the full name from the User model -->
+                <!-- Fetch the full name from the User model -->
                 <td>{{ contribution.profile.user.get_full_name|default:contribution.profile.user.first_name }}</td>
                 <td>{{ contribution.event.name }}</td>
                 <td>{{ contribution.amount }} Ksh</td>
@@ -63,19 +82,19 @@
         <ul class="pagination">
             {% if contributions.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ contributions.previous_page_number }}{% if selected_event %}&event={{ selected_event }}{% endif %}">&laquo;</a>
+                <a class="page-link" href="?page={{ contributions.previous_page_number }}{% if selected_event %}&event={{ selected_event }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">&laquo;</a>
             </li>
             {% endif %}
 
             {% for num in contributions.paginator.page_range %}
             <li class="page-item {% if contributions.number == num %}active{% endif %}">
-                <a class="page-link" href="?page={{ num }}{% if selected_event %}&event={{ selected_event }}{% endif %}">{{ num }}</a>
+                <a class="page-link" href="?page={{ num }}{% if selected_event %}&event={{ selected_event }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">{{ num }}</a>
             </li>
             {% endfor %}
 
             {% if contributions.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ contributions.next_page_number }}{% if selected_event %}&event={{ selected_event }}{% endif %}">&raquo;</a>
+                <a class="page-link" href="?page={{ contributions.next_page_number }}{% if selected_event %}&event={{ selected_event }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}">&raquo;</a>
             </li>
             {% endif %}
         </ul>
