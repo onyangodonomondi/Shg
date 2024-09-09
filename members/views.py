@@ -21,7 +21,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.db.models import Sum, Count
 from .models import Contribution, Event
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import JsonResponse
 from random import choice
 from django.db.models import F
@@ -119,10 +119,8 @@ def lineage_view(request):
     # Build family trees for couples
     families = {}
     for father, mother in couples:
-        # Consider the father and mother as a unit
         if father not in processed_profiles and mother not in processed_profiles:
             families[(father, mother)] = get_children(father)
-            # Mark both father and mother as processed
             processed_profiles.add(father)
             processed_profiles.add(mother)
 
@@ -134,37 +132,33 @@ def lineage_view(request):
         and not Profile.objects.filter(mother=profile).exists()
     ]
 
-    # Fetch individuals with unknown father or mother but who have descendants
+    # Add family trees for individuals with unknown parents but descendants, only if they haven't been processed
     unknown_parents_with_descendants = [
         profile for profile in unknown_parents_no_descendants
         if Profile.objects.filter(father=profile).exists() 
         or Profile.objects.filter(mother=profile).exists()
     ]
-
-    # Add family trees for individuals with unknown parents but descendants, only if they haven't been processed
     for profile in unknown_parents_with_descendants:
         if profile not in processed_profiles:
             families[profile] = get_children(profile)
             processed_profiles.add(profile)
 
-    # Combine profiles: first the ones with no descendants on a single page, then the family trees on other pages
-    all_profiles = no_descendants + list(families.items())
-
-    paginator = Paginator(all_profiles, 1)  # Show 1 person or family tree per page
-
+    # Paginate the families
+    families_list = list(families.items())  # Convert families dictionary to a list
+    paginator = Paginator(families_list, 1)  # Show 1 family tree per page
     page = request.GET.get('page', 1)
 
     try:
-        paginated_profiles = paginator.page(page)
+        paginated_families = paginator.page(page)
     except PageNotAnInteger:
-        paginated_profiles = paginator.page(1)
+        paginated_families = paginator.page(1)
     except EmptyPage:
-        paginated_profiles = paginator.page(paginator.num_pages)
+        paginated_families = paginator.page(paginator.num_pages)
 
     context = {
-        'profiles': paginated_profiles,
-        'families': families if isinstance(paginated_profiles.object_list[0], tuple) else None  # Show families only for those pages
+        'paginated_families': paginated_families,
     }
+
     return render(request, 'members/lineage.html', context)
 @user_passes_test(lambda u: u.is_staff)
 def manage_contributions(request):
