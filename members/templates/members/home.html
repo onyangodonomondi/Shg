@@ -61,7 +61,9 @@
                                         <td>{{ contribution.event.name }}</td>
                                         <td>Ksh {{ contribution.amount }}</td>
                                         <td>
-                                            {% if contribution.is_full %}
+                                            {% if contribution.amount == 0 %}
+                                            <span class="badge bg-danger">No Contribution</span>
+                                            {% elif contribution.is_full %}
                                             <span class="badge bg-success">Full</span>
                                             {% else %}
                                             <span class="badge bg-warning">Partial</span>
