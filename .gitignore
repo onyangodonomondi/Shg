@@ -1,26 +1,24 @@
-# Python bytecode files
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-.secure
-# Django migrations
+# Django migrations (ignore everything except __init__.py)
 */migrations/*
 !*/migrations/__init__.py
 
-# SQLite database
+# SQLite database files
 db.sqlite3
 *.sqlite3
 
-# Environment variables file
+# Environment variables file (commonly used with Django projects)
 .env
 *.env
 
+# Local settings (in case you're using separate local settings)
+local_settings.py
 
-# Local development settings
-/local_settings.py
-
-# Virtual environment
+# Virtual environments (common Python virtual environment names)
 venv/
 env/
 ENV/
@@ -29,52 +27,76 @@ ENV/
 env.bak/
 venv.bak/
 
-# macOS files
+# macOS system files
 .DS_Store
 
-# Backup files
+# Backup files from text editors
 *.bak
 *.swp
 *~
 
-# Logs
+# Log files
 *.log
 logs/
 *.out
 
-# Ignore the following by default, but keep if explicitly tracked
-!/.github/
-!.gitignore
-
-# Ignore IDE and editor-specific files
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# Ignore coverage reports
-htmlcov/
-.coverage
-.coverage.*
-
-# Ignore pipenv, poetry and pip-tools files
+# Ignore pipenv, poetry, and pip-tools lock files
 Pipfile
 Pipfile.lock
 poetry.lock
 *.lock
 requirements.txt
 
-# Ignore temporary files
-*.tmp
-*.temp
-
-# Ignore compiled C files
-*.so
-*.pyd
+# Ignore coverage reports
+htmlcov/
+.coverage
+.coverage.*
 
 # Ignore Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
-staticfiles/images/
+# Static files (including images)
+staticfiles/
 static/images/
+staticfiles/images/
+media/
+media/images/
+mediafiles/
+media_root/
+uploads/
+uploads/*
 
+# Ignore compiled C extension files
+*.so
+*.pyd
+
+# Ignore compiled libraries
+*.dll
+*.dylib
+*.exe
+
+# IDE / Editor-specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore unnecessary files created by some operating systems
+Thumbs.db
+Desktop.ini
+
+# Ignore Python egg files
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+*.manifest
+*.spec
+
+# GitHub-related files (only include the ones you explicitly want to track)
+!/.github/
+!.gitignore
+.secure
