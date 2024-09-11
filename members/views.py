@@ -369,10 +369,28 @@ def members_page(request):
 
 def export_contributions_pdf(request):
     selected_event = request.GET.get('event')
+    selected_status = request.GET.get('status')
+
+    contributions = Contribution.objects.all()
+
+    # Filter contributions by event
     if selected_event and selected_event != 'None':
-        contributions = Contribution.objects.filter(event__name=selected_event)
-    else:
-        contributions = Contribution.objects.all()
+        contributions = contributions.filter(event__name=selected_event)
+
+    # Filter contributions by status
+    if selected_status:
+        if selected_status == 'Fully Contributed':
+            contributions = contributions.filter(
+                Q(profile__gender='F', amount__gte=300) | 
+                Q(profile__gender='M', amount__gte=500)
+            )
+        elif selected_status == 'Partially Contributed':
+            contributions = contributions.filter(
+                Q(profile__gender='F', amount__gt=0, amount__lt=300) |
+                Q(profile__gender='M', amount__gt=0, amount__lt=500)
+            )
+        elif selected_status == 'No Contribution':
+            contributions = contributions.filter(amount=0)
 
     if not contributions.exists():
         return HttpResponse("No contributions found for export.", status=404)
@@ -383,7 +401,7 @@ def export_contributions_pdf(request):
 
     # Title
     title_style = getSampleStyleSheet()['Heading1']
-    title_style.alignment = 1  # Center align the title
+    title_style.alignment = 1
     title = Paragraph("Contributions Report", title_style)
     elements.append(title)
     elements.append(Spacer(1, 0.5 * inch))
@@ -391,17 +409,15 @@ def export_contributions_pdf(request):
     # Table data
     data = [["Member Name", "Event", "Amount", "Status"]]
     
-    # Access user names via the User model associated with Profile
     for contribution in contributions:
         profile = contribution.profile
         user = profile.user
-        profile_name = f"{user.first_name} {user.last_name}"  # Fetch full name from User model
+        profile_name = f"{user.first_name} {user.last_name}"
         event_name = contribution.event.name
         amount = f"{contribution.amount} Ksh"
         status = contribution.category
         data.append([profile_name, event_name, amount, status])
 
-    # Create the table
     table = Table(data, colWidths=[2 * inch, 2 * inch, 1.5 * inch, 1.5 * inch])
     table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.darkgrey),
@@ -423,10 +439,28 @@ def export_contributions_pdf(request):
 
 def export_contributions_excel(request):
     selected_event = request.GET.get('event')
+    selected_status = request.GET.get('status')
+
+    contributions = Contribution.objects.all()
+
+    # Filter contributions by event
     if selected_event and selected_event != 'None':
-        contributions = Contribution.objects.filter(event__name=selected_event)
-    else:
-        contributions = Contribution.objects.all()
+        contributions = contributions.filter(event__name=selected_event)
+
+    # Filter contributions by status
+    if selected_status:
+        if selected_status == 'Fully Contributed':
+            contributions = contributions.filter(
+                Q(profile__gender='F', amount__gte=300) | 
+                Q(profile__gender='M', amount__gte=500)
+            )
+        elif selected_status == 'Partially Contributed':
+            contributions = contributions.filter(
+                Q(profile__gender='F', amount__gt=0, amount__lt=300) |
+                Q(profile__gender='M', amount__gt=0, amount__lt=500)
+            )
+        elif selected_status == 'No Contribution':
+            contributions = contributions.filter(amount=0)
 
     if not contributions.exists():
         return HttpResponse("No contributions found for export.", status=404)
@@ -445,8 +479,8 @@ def export_contributions_excel(request):
     # Populate rows with contributions
     for row_num, contribution in enumerate(contributions, 1):
         profile = contribution.profile
-        user = profile.user  # Access the related User model
-        profile_name = f"{user.first_name} {user.last_name}"  # Fetch full name from User model
+        user = profile.user
+        profile_name = f"{user.first_name} {user.last_name}"
         event_name = contribution.event.name
         amount = f"{contribution.amount} Ksh"
         status = contribution.category
