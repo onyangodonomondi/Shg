@@ -49,6 +49,7 @@
                                 <thead>
                                     <tr>
                                         <th>Member Name</th>
+                                        <th>Gender</th> <!-- New column for gender -->
                                         <th>Event</th>
                                         <th>Amount</th>
                                         <th>Status</th>
@@ -58,6 +59,7 @@
                                     {% for contribution in page_obj %}
                                     <tr onclick="showMemberDetails('{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}', '{{ contribution.profile.user.email }}', '{{ contribution.total_contributions }}', '{{ contribution.event_count }}', '{{ contribution.amount }}', '{% if contribution.profile.image %}{{ contribution.profile.image.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}')">
                                         <td>{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}</td>
+                                        <td>{{ contribution.profile.get_gender_display }}</td> <!-- Display the gender -->
                                         <td>{{ contribution.event.name }}</td>
                                         <td>Ksh {{ contribution.amount }}</td>
                                         <td>

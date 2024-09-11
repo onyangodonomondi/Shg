@@ -38,8 +38,14 @@ def home(request):
         # Sum of all contributions for each profile
         total_contributions = Contribution.objects.filter(profile=contribution.profile).aggregate(Sum('amount'))['amount__sum'] or 0
 
-        # Determine if the contribution is full based on event required amount
-        required_amount = contribution.event.required_amount
+        # Determine the required amount based on gender
+        required_amount = contribution.event.required_amount  # Default event amount
+        if contribution.profile.gender == 'F':
+            required_amount = 300  # Full amount for women
+        elif contribution.profile.gender == 'M':
+            required_amount = 500  # Full amount for men
+
+        # Determine if the contribution is full based on the gender-specific required amount
         is_full = contribution.amount >= required_amount
 
         # Append the contribution data, including event count, total contributions, and full/partial status
