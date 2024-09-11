@@ -53,6 +53,7 @@
         <thead class="thead-dark">
             <tr>
                 <th scope="col">Member Name</th>
+                <th scope="col">Gender</th> <!-- Add Gender Column -->
                 <th scope="col">Event</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Status</th>
@@ -63,13 +64,46 @@
             <tr>
                 <!-- Fetch the full name from the User model -->
                 <td>{{ contribution.profile.user.get_full_name|default:contribution.profile.user.first_name }}</td>
+                
+                <!-- Display gender -->
+                <td>{{ contribution.profile.get_gender_display }}</td>
+                
                 <td>{{ contribution.event.name }}</td>
                 <td>{{ contribution.amount }} Ksh</td>
-                <td>{{ contribution.category }}</td>
+                
+                <!-- Calculate and display the contribution status based on gender -->
+                <td>
+                    {% if contribution.profile.gender == 'F' %}
+                        {% if contribution.amount >= 300 %}
+                            Fully Contributed
+                        {% elif contribution.amount > 0 %}
+                            Partially Contributed
+                        {% else %}
+                            No Contribution
+                        {% endif %}
+                    {% elif contribution.profile.gender == 'M' %}
+                        {% if contribution.amount >= 500 %}
+                            Fully Contributed
+                        {% elif contribution.amount > 0 %}
+                            Partially Contributed
+                        {% else %}
+                            No Contribution
+                        {% endif %}
+                    {% else %}
+                        <!-- Default logic if gender is unknown or not set -->
+                        {% if contribution.amount >= contribution.event.required_amount %}
+                            Fully Contributed
+                        {% elif contribution.amount > 0 %}
+                            Partially Contributed
+                        {% else %}
+                            No Contribution
+                        {% endif %}
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center">No contributions found</td>
+                <td colspan="5" class="text-center">No contributions found</td>
             </tr>
             {% endfor %}
         </tbody>

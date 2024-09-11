@@ -24,7 +24,7 @@ from .models import Contribution, Event
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import JsonResponse
 from random import choice
-from django.db.models import F
+from django.db.models import Q, F
 def home(request):
     # Fetch all contributions
     contributions = Contribution.objects.all()
@@ -314,9 +314,15 @@ def contributions_page(request):
     # Filter by status if selected
     if selected_status:
         if selected_status == 'Fully Contributed':
-            contributions = contributions.filter(amount__gte=F('event__required_amount'))
+            contributions = contributions.filter(
+                Q(profile__gender='F', amount__gte=300) | 
+                Q(profile__gender='M', amount__gte=500)
+            )
         elif selected_status == 'Partially Contributed':
-            contributions = contributions.filter(amount__lt=F('event__required_amount'), amount__gt=0)
+            contributions = contributions.filter(
+                Q(profile__gender='F', amount__gt=0, amount__lt=300) |
+                Q(profile__gender='M', amount__gt=0, amount__lt=500)
+            )
         elif selected_status == 'No Contribution':
             contributions = contributions.filter(amount=0)
 
