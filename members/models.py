@@ -24,6 +24,10 @@ class Profile(models.Model):
     has_children = models.BooleanField(default=False)
     number_of_children = models.PositiveIntegerField(null=True, blank=True)
 
+    # New fields for exempt and deceased members
+    is_exempt = models.BooleanField(default=False, help_text="Mark as exempt from contributions due to age or other reasons.")
+    is_deceased = models.BooleanField(default=False, help_text="Mark as deceased.")
+
     # New gender field with default value 'Unknown'
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True, default='U')
     
@@ -72,7 +76,6 @@ class Profile(models.Model):
         return siblings.distinct()
 
 
-
 class EventCategory(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -119,12 +122,20 @@ class Contribution(models.Model):
             # Fallback to the event's required amount for users with unknown gender
             full_amount = self.event.required_amount
 
+        # Handle exempt and deceased members
+        if self.profile.is_exempt:
+            return 'Exempt'
+        elif self.profile.is_deceased:
+            return 'Deceased'
+
+        # Determine if the contribution is full, partial, or not made
         if self.amount >= full_amount:
             return 'Fully Contributed'
         elif 0 < self.amount < full_amount:
             return 'Partially Contributed'
         else:
             return 'No Contribution'
+
 
 class Notification(models.Model):
     NOTIFICATION_TYPE_CHOICES = [

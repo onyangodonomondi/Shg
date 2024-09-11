@@ -12,9 +12,10 @@ class ProfileInline(admin.StackedInline):
     can_delete = False
     verbose_name_plural = 'Profile Details'
     fk_name = 'user'
-    fields = ('othernames', 'email', 'phone_number', 'birthdate', 'has_children', 'number_of_children', 'image')
+    fields = ('othernames', 'email', 'phone_number', 'birthdate', 'has_children', 'number_of_children', 'image', 'is_exempt', 'is_deceased')
 
-# Custom filter for Contribution categories
+
+# Custom filter for Contribution categories including exempt and deceased members
 class CategoryFilter(SimpleListFilter):
     title = 'Category'  # The title displayed in the filter dropdown
     parameter_name = 'category'  # The URL query parameter used for the filter
@@ -25,25 +26,32 @@ class CategoryFilter(SimpleListFilter):
             ('Fully Contributed', 'Fully Contributed'),
             ('Partially Contributed', 'Partially Contributed'),
             ('No Contribution', 'No Contribution'),
+            ('Exempt', 'Exempt'),
+            ('Deceased', 'Deceased'),
         ]
 
     def queryset(self, request, queryset):
         """Return the filtered queryset based on the selected filter option."""
         value = self.value()
         if value == 'Fully Contributed':
-            return queryset.filter(amount__gte=models.F('event__required_amount'))
+            return queryset.filter(amount__gte=models.F('event__required_amount'), profile__is_exempt=False, profile__is_deceased=False)
         elif value == 'Partially Contributed':
-            return queryset.filter(amount__gt=0, amount__lt=models.F('event__required_amount'))
+            return queryset.filter(amount__gt=0, amount__lt=models.F('event__required_amount'), profile__is_exempt=False, profile__is_deceased=False)
         elif value == 'No Contribution':
-            return queryset.filter(amount=0)
+            return queryset.filter(amount=0, profile__is_exempt=False, profile__is_deceased=False)
+        elif value == 'Exempt':
+            return queryset.filter(profile__is_exempt=True)
+        elif value == 'Deceased':
+            return queryset.filter(profile__is_deceased=True)
         return queryset
+
 
 # Customized User admin with profile details
 class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline,)
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_phone_number', 'get_other_names')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'get_phone_number', 'get_other_names', 'is_exempt', 'is_deceased')
     search_fields = ('username', 'first_name', 'last_name', 'email')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups', 'profile__is_exempt', 'profile__is_deceased')
 
     def get_phone_number(self, obj):
         return obj.profile.phone_number
@@ -53,14 +61,26 @@ class UserAdmin(BaseUserAdmin):
         return obj.profile.othernames
     get_other_names.short_description = 'Other Names'
 
+    def is_exempt(self, obj):
+        return obj.profile.is_exempt
+    is_exempt.short_description = 'Exempt'
+    is_exempt.boolean = True
+
+    def is_deceased(self, obj):
+        return obj.profile.is_deceased
+    is_deceased.short_description = 'Deceased'
+    is_deceased.boolean = True
+
     def get_inline_instances(self, request, obj=None):
         if not obj:
             return []
         return super(UserAdmin, self).get_inline_instances(request, obj)
 
+
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+
 
 # Admin customization for Event
 @admin.register(Event)
@@ -87,6 +107,7 @@ class EventAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         return qs.order_by('date')
 
+
 # Admin customization for Contribution
 @admin.register(Contribution)
 class ContributionAdmin(admin.ModelAdmin):
@@ -100,10 +121,12 @@ class ContributionAdmin(admin.ModelAdmin):
         return f"{obj.profile.user.first_name} {obj.profile.user.last_name}"
     get_profile_name.short_description = 'Profile Name'
 
+
+# Admin customization for Profile
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'father', 'mother')
+    list_display = ('user', 'father', 'mother', 'is_exempt', 'is_deceased')
     search_fields = ('user__username', 'father__user__username', 'mother__user__username')
-    list_filter = ('user',)
+    list_filter = ('user__username', 'is_exempt', 'is_deceased')
     raw_id_fields = ('father', 'mother')  # This makes it easier to search for users in a large database
 
 
