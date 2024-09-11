@@ -68,17 +68,13 @@
         background-color: #007bff !important;
     }
 
-    .social-icons a {
-        margin: 0 10px;
-        font-size: 18px;
-        color: #333;
-        text-decoration: none;
+    .exempt-member {
+        background-color: #17a2b8 !important;
     }
 
-    .social-icons a:hover {
-        color: #007bff;
+    .deceased-member {
+        background-color: #6c757d !important;
     }
-
 </style>
 
 <div class="container">
@@ -92,6 +88,8 @@
                     <option value="Dormant" {% if selected_category == "Dormant" %}selected{% endif %}>Dormant</option>
                     <option value="QUASI Member" {% if selected_category == "QUASI Member" %}selected{% endif %}>QUASI Member</option>
                     <option value="Active Member" {% if selected_category == "Active Member" %}selected{% endif %}>Active Member</option>
+                    <option value="Exempt" {% if selected_category == "Exempt" %}selected{% endif %}>Exempt</option>
+                    <option value="Deceased" {% if selected_category == "Deceased" %}selected{% endif %}>Deceased</option>
                 </select>
             </div>
         </div>
@@ -115,23 +113,18 @@
                         {% elif member.category == 'QUASI Member' %} quasi-member
                         {% elif member.category == 'Dormant' %} dormant-member
                         {% elif member.category == 'Active Member' %} active-member
+                        {% elif member.profile.is_exempt %} exempt-member
+                        {% elif member.profile.is_deceased %} deceased-member
                         {% endif %}
                     ">
-                        {{ member.category }}
+                        {% if member.profile.is_deceased %}
+                            Deceased
+                        {% elif member.profile.is_exempt %}
+                            Exempt
+                        {% else %}
+                            {{ member.category }}
+                        {% endif %}
                     </span>
-
-                    <!-- Social media icons (optional) -->
-                    <div class="social-icons mt-3">
-                        {% if member.profile.linkedin %}
-                        <a href="{{ member.profile.linkedin }}" target="_blank"><i class="fab fa-linkedin"></i></a>
-                        {% endif %}
-                        {% if member.profile.twitter %}
-                        <a href="{{ member.profile.twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
-                        {% endif %}
-                        {% if member.profile.website %}
-                        <a href="{{ member.profile.website }}" target="_blank"><i class="fas fa-globe"></i></a>
-                        {% endif %}
-                    </div>
                 </div>
             </div>
         </div>
