@@ -58,7 +58,7 @@ class UserAdmin(BaseUserAdmin):
             return []
         return super(UserAdmin, self).get_inline_instances(request, obj)
 
-# Re-register UserAdmin with custom profile inline
+# Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
