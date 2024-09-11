@@ -7,6 +7,12 @@ from PIL import Image
 
 
 class Profile(models.Model):
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('U', 'Unknown')  # Add an 'Unknown' option for existing users
+    ]
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
     bio = models.TextField(max_length=500, blank=True)
@@ -18,13 +24,16 @@ class Profile(models.Model):
     has_children = models.BooleanField(default=False)
     number_of_children = models.PositiveIntegerField(null=True, blank=True)
 
+    # New gender field with default value 'Unknown'
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True, default='U')
+    
     # Lineage tracking fields
     father = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='father_children')
     mother = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='mother_children')
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}'
-    
+
     def age(self):
         if self.birthdate:
             today = date.today()
@@ -98,13 +107,24 @@ class Contribution(models.Model):
 
     @property
     def category(self):
-        if self.amount >= self.event.required_amount:
+        # Default required amount for event
+        full_amount = self.event.required_amount
+
+        # Adjust full contribution amount based on gender
+        if self.profile.gender == 'F':
+            full_amount = 300
+        elif self.profile.gender == 'M':
+            full_amount = 500
+        elif self.profile.gender == 'U' or not self.profile.gender:
+            # Fallback to the event's required amount for users with unknown gender
+            full_amount = self.event.required_amount
+
+        if self.amount >= full_amount:
             return 'Fully Contributed'
-        elif 0 < self.amount < self.event.required_amount:
+        elif 0 < self.amount < full_amount:
             return 'Partially Contributed'
         else:
             return 'No Contribution'
-
 
 class Notification(models.Model):
     NOTIFICATION_TYPE_CHOICES = [
