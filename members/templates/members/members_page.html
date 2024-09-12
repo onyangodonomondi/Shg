@@ -139,23 +139,30 @@
             <ul class="pagination">
                 {% if profiles.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ profiles.previous_page_number }}">&laquo;</a>
+                    <a class="page-link" href="?page={{ profiles.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}">&laquo;</a>
                 </li>
                 {% endif %}
-
+    
                 {% for num in profiles.paginator.page_range %}
-                <li class="page-item {% if profiles.number == num %}active{% endif %}">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                </li>
+                    {% if num == 1 or num == profiles.paginator.num_pages or num >= profiles.number|add:-2 and num <= profiles.number|add:2 %}
+                        <li class="page-item {% if profiles.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}{% if selected_category %}&category={{ selected_category }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% elif num == 2 or num == profiles.paginator.num_pages|add:-1 %}
+                        <li class="page-item disabled">
+                            <a class="page-link">…</a>
+                        </li>
+                    {% endif %}
                 {% endfor %}
-
+    
                 {% if profiles.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ profiles.next_page_number }}">&raquo;</a>
+                    <a class="page-link" href="?page={{ profiles.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}">&raquo;</a>
                 </li>
                 {% endif %}
             </ul>
         </nav>
     </div>
+
 </div>
 {% endblock %}

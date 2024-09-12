@@ -9,6 +9,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('lineage/', views.lineage_view, name='lineage'),
     path('member-contributions-json/', member_contributions_json, name='member_contributions_json'),
+    path('home-details-json/', views.home_details_json, name='home_details_json'),
 
     # Event Management
     path('events/', views.events_page, name='events_page'),

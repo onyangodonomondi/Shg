@@ -55,6 +55,7 @@ def home(request):
 
     return render(request, 'members/home.html', {'page_obj': page_obj})
 
+
 # Custom Password Reset View
 class CustomPasswordResetView(PasswordResetView):
     template_name = 'registration/password_reset_form.html'
@@ -340,12 +341,15 @@ def member_contributions_json(request):
     profiles = Profile.objects.all()
 
     if profiles.exists():
+        # Select a random member for demo purposes, you can modify this logic
         selected_member = choice(profiles)
         contributions = Contribution.objects.filter(profile=selected_member)
 
+        # Calculate total contributions and event count
         total_contributions = contributions.aggregate(Sum('amount'))['amount__sum'] or 0
         event_count = contributions.values('event').distinct().count()
 
+        # Prepare data to be sent in JSON response
         data = {
             'name': f'{selected_member.user.first_name} {selected_member.user.last_name}',
             'email': selected_member.user.email,
@@ -355,6 +359,7 @@ def member_contributions_json(request):
             'profile_pic': selected_member.image.url if selected_member.image else '/static/images/default_profile.jpg',
         }
     else:
+        # If no profiles are available, return default values
         data = {
             'name': 'No Members Available',
             'email': 'N/A',
@@ -363,6 +368,8 @@ def member_contributions_json(request):
             'total_amount': 0,
             'profile_pic': '/static/images/default_profile.jpg',
         }
+
+    return JsonResponse(data)
 def signup(request):
     if request.method == 'POST':
         form = UserSignUpForm(request.POST)
@@ -386,10 +393,11 @@ def export_contributions_pdf(request):
     # Get all contributions
     contributions = Contribution.objects.all()
 
-    # Apply filtering if necessary
-    if selected_event:
+    # If 'None' is passed as the event or status, it should not filter
+    if selected_event and selected_event != 'None':
         contributions = contributions.filter(event__name=selected_event)
-    if selected_status:
+
+    if selected_status and selected_status != 'None':
         if selected_status == 'Fully Contributed':
             contributions = contributions.filter(
                 Q(profile__gender='F', amount__gte=300) | 
@@ -402,6 +410,10 @@ def export_contributions_pdf(request):
             )
         elif selected_status == 'No Contribution':
             contributions = contributions.filter(amount=0)
+
+    if not contributions.exists():
+        # Handle case where no contributions match the filter
+        return HttpResponse("No data available to export.", status=404)
 
     # Create a PDF document
     buffer = io.BytesIO()
@@ -444,7 +456,8 @@ def export_contributions_pdf(request):
 
     # Serve the PDF as a response
     buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename='contributions_report.pdf')    
+    return FileResponse(buffer, as_attachment=True, filename='contributions_report.pdf')
+
 
 def export_contributions_excel(request):
     # Get filter parameters (optional)
@@ -470,6 +483,10 @@ def export_contributions_excel(request):
             )
         elif selected_status == 'No Contribution':
             contributions = contributions.filter(amount=0)
+
+    if not contributions.exists():
+        # Handle case where no contributions match the filter
+        return HttpResponse("No data available to export.", status=404)
 
     # Create an in-memory output file for the new Excel file.
     output = io.BytesIO()
@@ -507,3 +524,20 @@ def export_contributions_excel(request):
     response['Content-Disposition'] = 'attachment; filename=contributions_report.xlsx'
 
     return response
+
+
+def home_details_json(request):
+    user = request.user
+    # Dummy data for recent activity, total events, ongoing projects, and contributions
+    recent_activity = "None"
+    total_events = Event.objects.count()  # Example to count all events
+    ongoing_projects = Project.objects.filter(status="ongoing").count()  # Replace 'Project' with the appropriate model
+    latest_contributions = Contribution.objects.filter(profile=user.profile).aggregate(Sum('amount'))['amount__sum'] or 0
+
+    return JsonResponse({
+        'username': user.get_full_name() or user.username,
+        'recent_activity': recent_activity,
+        'total_events': total_events,
+        'ongoing_projects': ongoing_projects,
+        'latest_contributions': latest_contributions,
+    })

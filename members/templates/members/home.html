@@ -45,42 +45,45 @@
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <h4 class="mb-4">Members and Contributions</h4>
-                            <table class="table table-hover table-responsive-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Member Name</th>
-                                        <th>Gender</th> <!-- New column for gender -->
-                                        <th>Event</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for contribution in page_obj %}
-                                    <tr onclick="showMemberDetails('{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}', '{{ contribution.profile.user.email }}', '{{ contribution.total_contributions }}', '{{ contribution.event_count }}', '{{ contribution.amount }}', '{% if contribution.profile.image %}{{ contribution.profile.image.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}')">
-                                        <td>{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}</td>
-                                        <td>{{ contribution.profile.get_gender_display }}</td> <!-- Display the gender -->
-                                        <td>{{ contribution.event.name }}</td>
-                                        <td>Ksh {{ contribution.amount }}</td>
-                                        <td>
-                                            {% if contribution.amount == 0 %}
-                                            <span class="badge bg-danger">No Contribution</span>
-                                            {% elif contribution.is_full %}
-                                            <span class="badge bg-success">Full</span>
-                                            {% else %}
-                                            <span class="badge bg-warning">Partial</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                            <!-- Add table-responsive class to make the table scrollable on smaller screens -->
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Member Name</th>
+                                            <th>Gender</th> <!-- New column for gender -->
+                                            <th>Event</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for contribution in page_obj %}
+                                        <tr onclick="showMemberDetails('{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}', '{{ contribution.profile.user.email }}', '{{ contribution.total_contributions }}', '{{ contribution.event_count }}', '{{ contribution.amount }}', '{% if contribution.profile.image %}{{ contribution.profile.image.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}')">
+                                            <td>{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}</td>
+                                            <td>{{ contribution.profile.get_gender_display }}</td> <!-- Display the gender -->
+                                            <td>{{ contribution.event.name }}</td>
+                                            <td>Ksh {{ contribution.amount }}</td>
+                                            <td>
+                                                {% if contribution.amount == 0 %}
+                                                <span class="badge bg-danger">No Contribution</span>
+                                                {% elif contribution.is_full %}
+                                                <span class="badge bg-success">Full</span>
+                                                {% else %}
+                                                <span class="badge bg-warning">Partial</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div> <!-- Close table-responsive div -->
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Pagination Controls -->
+            <!-- Pagination Controls with Ellipses -->
             <div class="pagination justify-content-center mt-4">
                 <ul class="pagination">
                     {% if page_obj.has_previous %}
@@ -99,14 +102,36 @@
                         </li>
                     {% endif %}
 
-                    <!-- Page numbers -->
+                    <!-- Display page 1 and ellipses -->
+                    {% if page_obj.number > 3 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">1</a>
+                        </li>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+
+                    <!-- Display 2 pages before and 2 pages after current page -->
                     {% for num in page_obj.paginator.page_range %}
-                        {% if page_obj.number == num %}
-                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                        {% else %}
-                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% if num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
                         {% endif %}
                     {% endfor %}
+
+                    <!-- Display ellipses and last page -->
+                    {% if page_obj.number < page_obj.paginator.num_pages|add:-2 %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+                        </li>
+                    {% endif %}
 
                     {% if page_obj.has_next %}
                         <li class="page-item">
@@ -129,7 +154,7 @@
     </div>
 </div>
 
-<!-- JavaScript for auto-updating member details every second -->
+<!-- JavaScript for auto-updating member details -->
 <script>
 function updateMemberDetails() {
     fetch('/member-contributions-json/')
