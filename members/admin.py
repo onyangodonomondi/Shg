@@ -34,9 +34,9 @@ class CategoryFilter(SimpleListFilter):
         """Return the filtered queryset based on the selected filter option."""
         value = self.value()
         if value == 'Fully Contributed':
-            return queryset.filter(amount__gte=models.F('event__required_amount'), profile__is_exempt=False, profile__is_deceased=False)
+            return queryset.filter(amount__gte=models.F('event__required_amount_male'), profile__is_exempt=False, profile__is_deceased=False)
         elif value == 'Partially Contributed':
-            return queryset.filter(amount__gt=0, amount__lt=models.F('event__required_amount'), profile__is_exempt=False, profile__is_deceased=False)
+            return queryset.filter(amount__gt=0, amount__lt=models.F('event__required_amount_male'), profile__is_exempt=False, profile__is_deceased=False)
         elif value == 'No Contribution':
             return queryset.filter(amount=0, profile__is_exempt=False, profile__is_deceased=False)
         elif value == 'Exempt':
@@ -85,13 +85,13 @@ admin.site.register(User, UserAdmin)
 # Admin customization for Event
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('name', 'date', 'required_amount', 'is_active')
+    list_display = ('name', 'date', 'required_amount_male', 'required_amount_female', 'is_active')  # Updated the required_amount fields
     search_fields = ('name',)
     list_filter = ('date', 'is_active')
     ordering = ('date',)
     fieldsets = (
         ('Event Details', {
-            'fields': ('name', 'date', 'required_amount', 'is_active')
+            'fields': ('name', 'date', 'required_amount_male', 'required_amount_female', 'is_active')  # Updated the fields here
         }),
     )
 

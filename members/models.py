@@ -87,14 +87,17 @@ class EventCategory(models.Model):
 class Event(models.Model):
     name = models.CharField(max_length=200)
     date = models.DateField()
-    required_amount = models.DecimalField(max_digits=10, decimal_places=2, default=200.00)
-    is_active = models.BooleanField(default=True)  # Field to indicate if the event is active
+
+    # Add safe default values for these fields
+    required_amount_male = models.DecimalField(max_digits=10, decimal_places=2, default=500.00)
+    required_amount_female = models.DecimalField(max_digits=10, decimal_places=2, default=300.00)
+
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
-        # Automatically mark the event as inactive if the date has passed
         if self.date < date.today():
             self.is_active = False
         super(Event, self).save(*args, **kwargs)
@@ -110,18 +113,14 @@ class Contribution(models.Model):
 
     @property
     def category(self):
-        # Default required amount for event
-        full_amount = self.event.required_amount
-
-        # Adjust full contribution amount based on gender
+        # Determine the required contribution based on the user's gender and event details
         if self.profile.gender == 'F':
-            full_amount = 300
+            full_amount = self.event.required_amount_female
         elif self.profile.gender == 'M':
-            full_amount = 500
-        elif self.profile.gender == 'U' or not self.profile.gender:
-            # Fallback to the event's required amount for users with unknown gender
-            full_amount = self.event.required_amount
-
+            full_amount = self.event.required_amount_male
+        else:
+            full_amount = self.event.required_amount_female  # Default to female amount for unknown gender
+        
         # Handle exempt and deceased members
         if self.profile.is_exempt:
             return 'Exempt'
@@ -135,6 +134,7 @@ class Contribution(models.Model):
             return 'Partially Contributed'
         else:
             return 'No Contribution'
+
 
 
 class Notification(models.Model):

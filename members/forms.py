@@ -72,8 +72,7 @@ class ProfileUpdateForm(forms.ModelForm):
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['name', 'date', 'required_amount', 'is_active']
-
+        fields = ['name', 'date', 'required_amount_male', 'required_amount_female', 'is_active']
 
 # Contribution Form
 class ContributionForm(forms.ModelForm):
