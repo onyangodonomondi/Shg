@@ -1,157 +1,180 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Member Contributions{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <div class="row">
-        <!-- Main Content (No Sidebar) -->
-        <main class="col-12 px-md-4">
-            <!-- Dynamic Top Section -->
-            <div id="member-details" class="row mt-4">
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body text-center">
-                            <!-- Update the profile picture dynamically -->
-                            <img id="profile-pic" src="{% static 'images/default_profile.jpg' %}" class="rounded-circle mb-3 profile-img" alt="Profile Picture">
-                            <h4 id="member-name" class="font-weight-bold">Select a Member</h4>
-                            <p class="text-muted" id="member-email">Email: example@example.com</p>
-                            <p class="text-muted" id="member-contributions">Total Contributions: Ksh 0</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body text-center">
-                            <h4>Total Events</h4>
-                            <p class="display-4 font-weight-bold text-primary" id="total-events">0</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-body text-center">
-                            <h4>Contributions Amount</h4>
-                            <p class="display-4 font-weight-bold text-success" id="total-amount">Ksh 0</p>
-                        </div>
-                    </div>
+    <!-- Dynamic Statistics Section -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm" style="border-left: 5px solid #007bff;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Members</h5>
+                    <p class="display-4 font-weight-bold text-primary">{{ total_members }}</p>
                 </div>
             </div>
-
-            <!-- Member Contribution List (Lower Table) -->
-            <div class="row mt-4">
-                <div class="col-md-12">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h4 class="mb-4">Members and Contributions</h4>
-                            <!-- Add table-responsive class to make the table scrollable on smaller screens -->
-                            <div class="table-responsive">
-                                <table class="table table-hover table-bordered">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th>Member Name</th>
-                                            <th>Gender</th> <!-- New column for gender -->
-                                            <th>Event</th>
-                                            <th>Amount</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for contribution in page_obj %}
-                                        <tr onclick="showMemberDetails('{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}', '{{ contribution.profile.user.email }}', '{{ contribution.total_contributions }}', '{{ contribution.event_count }}', '{{ contribution.amount }}', '{% if contribution.profile.image %}{{ contribution.profile.image.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}')">
-                                            <td>{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}</td>
-                                            <td>{{ contribution.profile.get_gender_display }}</td> <!-- Display the gender -->
-                                            <td>{{ contribution.event.name }}</td>
-                                            <td>Ksh {{ contribution.amount }}</td>
-                                            <td>
-                                                {% if contribution.amount == 0 %}
-                                                <span class="badge bg-danger">No Contribution</span>
-                                                {% elif contribution.is_full %}
-                                                <span class="badge bg-success">Full</span>
-                                                {% else %}
-                                                <span class="badge bg-warning">Partial</span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div> <!-- Close table-responsive div -->
-                        </div>
-                    </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm" style="border-left: 5px solid #28a745;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Active Contributors</h5>
+                    <p class="display-4 font-weight-bold text-success">{{ active_contributors }}</p>
                 </div>
             </div>
-
-            <!-- Pagination Controls with Ellipses -->
-            <div class="pagination justify-content-center mt-4">
-                <ul class="pagination">
-                    {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page=1">&laquo; First</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&lsaquo; Previous</a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">&laquo; First</span>
-                        </li>
-                        <li class="page-item disabled">
-                            <span class="page-link">&lsaquo; Previous</span>
-                        </li>
-                    {% endif %}
-
-                    <!-- Display page 1 and ellipses -->
-                    {% if page_obj.number > 3 %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page=1">1</a>
-                        </li>
-                        <li class="page-item disabled">
-                            <span class="page-link">...</span>
-                        </li>
-                    {% endif %}
-
-                    <!-- Display 2 pages before and 2 pages after current page -->
-                    {% for num in page_obj.paginator.page_range %}
-                        {% if num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
-                            {% if page_obj.number == num %}
-                                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                            {% else %}
-                                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-
-                    <!-- Display ellipses and last page -->
-                    {% if page_obj.number < page_obj.paginator.num_pages|add:-2 %}
-                        <li class="page-item disabled">
-                            <span class="page-link">...</span>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
-                        </li>
-                    {% endif %}
-
-                    {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next &rsaquo;</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-                        </li>
-                    {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link">Next &rsaquo;</span>
-                        </li>
-                        <li class="page-item disabled">
-                            <span class="page-link">Last &raquo;</span>
-                        </li>
-                    {% endif %}
-                </ul>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm" style="border-left: 5px solid #ffc107;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Partial Contributors</h5>
+                    <p class="display-4 font-weight-bold text-warning">{{ partial_contributors }}</p>
+                </div>
             </div>
-        </main>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm" style="border-left: 5px solid #dc3545;">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Dormant Contributors</h5>
+                    <p class="display-4 font-weight-bold text-danger">{{ dormant_contributors }}</p>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Member Details Section -->
+    <div id="member-details" class="row mt-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body d-flex align-items-center">
+                    <!-- Dynamic Profile Picture -->
+                    <img id="profile-pic" src="{% static 'images/default_profile.jpg' %}" class="rounded-circle" alt="Profile Picture" style="width: 80px; height: 80px; margin-right: 20px;">
+                    
+                    <!-- Member Info -->
+                    <div>
+                        <h5 id="member-name" class="font-weight-bold mb-1">Select a Member</h5>
+                        <p class="text-muted mb-1" id="event-name">Event: Select an Event</p> <!-- Updated from email to event -->
+                        <p class="text-muted mb-0" id="member-contributions">Total Contributions: Ksh 0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Total Events</h5>
+                    <p class="display-4 font-weight-bold text-primary" id="total-events">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5>Contributions Amount</h5>
+                    <p class="display-4 font-weight-bold text-success" id="total-amount">Ksh 0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Contributions Table -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="mb-4">Members and Contributions</h4>
+                    <!-- Table with scrollable option on small screens -->
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-hover table-bordered">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Member Name</th>
+                                    <th>Event</th>
+                                    <th>Amount</th>
+                                    <th class="status-column">Status</th> <!-- Status column -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contribution in page_obj %}
+                                <tr onclick="showMemberDetails('{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}', '{{ contribution.event.name }}', '{{ contribution.total_contributions }}', '{{ contribution.event_count }}', '{{ contribution.amount }}', '{% if contribution.profile.image %}{{ contribution.profile.image.url }}{% else %}{% static 'images/default_profile.jpg' %}{% endif %}')">
+                                    <td>{{ contribution.profile.user.first_name }} {{ contribution.profile.user.last_name }}</td>
+                                    <td>{{ contribution.event.name }}</td>
+                                    <td>Ksh {{ contribution.amount }}</td>
+                                    <td class="status-column">
+                                        {% if contribution.amount == 0 %}
+                                        <span class="badge bg-danger">No Contribution</span>
+                                        {% elif contribution.is_full %}
+                                        <span class="badge bg-success">Full</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Partial</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pagination justify-content-center mt-4">
+        <ul class="pagination">
+            <!-- Previous Button -->
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&lsaquo; Previous</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&lsaquo; Previous</span>
+            </li>
+            {% endif %}
+
+            <!-- Numbered Pagination (hidden on mobile) -->
+            <div class="numbered-pagination">
+                {% if page_obj.number > 3 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">1</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.number < page_obj.paginator.num_pages|add:-2 %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+                </li>
+                {% endif %}
+            </div>
+
+            <!-- Next Button -->
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next &rsaquo;</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">Next &rsaquo;</span>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    
 </div>
 
 <!-- JavaScript for auto-updating member details -->
@@ -165,7 +188,7 @@ function updateMemberDetails() {
 
         // Update the member details on the page
         document.getElementById("member-name").innerText = data.name;
-        document.getElementById("member-email").innerText = "Email: " + data.email;
+        document.getElementById("event-name").innerText = "Event: " + data.event_name; // Updated to show event name
         document.getElementById("member-contributions").innerText = "Total Contributions: Ksh " + parseFloat(data.total_contributions).toFixed(2);
         document.getElementById("total-events").innerText = data.event_count;
         document.getElementById("total-amount").innerText = "Ksh " + parseFloat(data.total_amount).toFixed(2);
@@ -181,5 +204,46 @@ function updateMemberDetails() {
 // Call the update function every 1.5 seconds
 setInterval(updateMemberDetails, 1500);
 </script>
+
+<!-- CSS to hide the Status column on mobile devices -->
+<style>
+   @media only screen and (max-width: 767px) {
+    .numbered-pagination {
+        display: none;
+    }
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style-type: none;
+    padding: 0;
+}
+
+.pagination li {
+    display: inline-block;
+}
+
+.pagination a, .pagination span {
+    display: inline-block;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #007bff;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+    border-radius: 4px;
+}
+
+.pagination .active span {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination .disabled span {
+    color: #ccc;
+}
+
+</style>
 
 {% endblock %}

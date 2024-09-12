@@ -20,10 +20,17 @@ from django.contrib.auth.models import User
 
 # Home View
 def home(request):
+    # Fetch contributions and profiles
     contributions = Contribution.objects.annotate(
         event_count=Count('event', distinct=True),
         total_contributions=Sum('amount')
     ).order_by('-event__date')
+
+    # Initialize counters for contributors
+    active_contributors = 0
+    dormant_contributors = 0
+    partial_contributors = 0
+    total_members = Profile.objects.count()
 
     contributions_data = []
     for contribution in contributions:
@@ -38,6 +45,14 @@ def home(request):
         # Determine if the contribution is full based on the required amount
         is_full = contribution.amount >= required_amount
 
+        # Classify the contributor as active, dormant, or partial
+        if is_full:
+            active_contributors += 1
+        elif contribution.amount == 0:
+            dormant_contributors += 1
+        else:
+            partial_contributors += 1
+
         # Add the contribution details to the contributions_data list
         contributions_data.append({
             'profile': contribution.profile,
@@ -49,11 +64,20 @@ def home(request):
         })
 
     # Paginate the contributions (10 per page)
-    paginator = Paginator(contributions_data, 10)
+    paginator = Paginator(contributions_data, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-    return render(request, 'members/home.html', {'page_obj': page_obj})
+    # Add the new fields to the context
+    context = {
+        'page_obj': page_obj,
+        'total_members': total_members,
+        'active_contributors': active_contributors,
+        'dormant_contributors': dormant_contributors,
+        'partial_contributors': partial_contributors,
+    }
+
+    return render(request, 'members/home.html', context)
 
 
 # Custom Password Reset View
@@ -345,6 +369,10 @@ def member_contributions_json(request):
         selected_member = choice(profiles)
         contributions = Contribution.objects.filter(profile=selected_member)
 
+        # Check if contributions exist and get the latest event
+        latest_contribution = contributions.order_by('-event__date').first()
+        latest_event = latest_contribution.event.name if latest_contribution else "No Event Available"
+
         # Calculate total contributions and event count
         total_contributions = contributions.aggregate(Sum('amount'))['amount__sum'] or 0
         event_count = contributions.values('event').distinct().count()
@@ -352,7 +380,7 @@ def member_contributions_json(request):
         # Prepare data to be sent in JSON response
         data = {
             'name': f'{selected_member.user.first_name} {selected_member.user.last_name}',
-            'email': selected_member.user.email,
+            'event_name': latest_event,  # Set latest event here
             'total_contributions': total_contributions,
             'event_count': event_count,
             'total_amount': total_contributions,
@@ -362,12 +390,14 @@ def member_contributions_json(request):
         # If no profiles are available, return default values
         data = {
             'name': 'No Members Available',
-            'email': 'N/A',
+            'event_name': 'No Event Available',
             'total_contributions': 0,
             'event_count': 0,
             'total_amount': 0,
             'profile_pic': '/static/images/default_profile.jpg',
         }
+
+    return JsonResponse(data)
 
     return JsonResponse(data)
 def signup(request):
