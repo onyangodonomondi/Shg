@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Room: {{ room.name }}</h2>
+    <div id="chat-log">
+        {% for message in messages %}
+            <p><strong>{{ message.user.username }}</strong>: {{ message.content }}</p>
+        {% endfor %}
+    </div>
+
+    <form action="{% url 'send_message' room.name %}" method="POST">
+        {% csrf_token %}
+        <textarea name="message" rows="3"></textarea>
+        <button type="submit">Send</button>
+    </form>
+{% endblock %}
