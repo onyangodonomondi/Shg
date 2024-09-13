@@ -1,0 +1,26 @@
+<div class="chat-header">
+    <h2 class="text-center">Room: {{ room.name }}</h2>
+  </div>
+  <div class="message-list" id="message-list">
+    <!-- Loop through messages -->
+    {% for message in messages %}
+      <div class="message-item">
+        <span class="username">{{ message.user.username }}</span>
+        {% if message.content %}
+          <p class="content">{{ message.content }}</p>
+        {% endif %}
+        {% if message.image %}
+          <img src="{{ message.image.url }}" alt="Sent Image">
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  <form action="{% url 'send_message' room.name %}" method="POST" enctype="multipart/form-data" id="chat-form">
+    {% csrf_token %}
+    <div class="input-group">
+      <textarea class="form-control message-input" name="message" rows="3" placeholder="Type your message here..."></textarea>
+      <input type="file" name="image" class="form-control ms-2" accept="image/*"> <!-- File input for images -->
+      <button class="send-button ms-2" type="submit">Send</button>
+    </div>
+  </form>
+  

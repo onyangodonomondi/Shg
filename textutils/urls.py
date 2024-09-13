@@ -7,6 +7,8 @@ urlpatterns = [
     
     path('admin/', admin.site.urls),
     path('', include('members.urls')),  # Include URLs from the members app
+     path('chat/', include('chat.urls')),
+    
 ]
 
 if settings.DEBUG:

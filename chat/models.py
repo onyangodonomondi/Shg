@@ -12,11 +12,17 @@ class Room(models.Model):
 class Message(models.Model):
     room = models.ForeignKey(Room, related_name='messages', on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name='messages', on_delete=models.CASCADE)
-    content = models.TextField()
+    content = models.TextField(blank=True, null=True)  # Allow blank content if it's just an image
+    image = models.ImageField(upload_to='chat_images/', blank=True, null=True)  # Optional image field
     timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'{self.user.username}: {self.content[:50]}'
+        if self.content:
+            return f'{self.user.username}: {self.content[:50]}'
+        elif self.image:
+            return f'{self.user.username} sent an image'
+        else:
+            return f'{self.user.username}: [Empty message]'
 
     class Meta:
         ordering = ['timestamp']

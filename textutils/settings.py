@@ -26,9 +26,23 @@ if DEBUG:
 else:
     ALLOWED_HOSTS = ["nyagwa.co.ke", "www.nyagwa.co.ke", "172.233.249.179"]
 
+# ASGI Application for Django Channels
+ASGI_APPLICATION = 'textutils.asgi.application'
+
+# Redis Channel Layer Configuration
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],  # Redis server host and port
+        },
+    },
+}
+
 # Application definition
 INSTALLED_APPS = [
-    
+    'channels',  # Add channels to the installed apps
+    'chat',  # Add your chat app
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,6 +86,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'textutils.wsgi.application'
+ASGI_APPLICATION = 'textutils.asgi.application'  # For Channels
 
 # Database
 DATABASES = {
@@ -121,9 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Authentication Redirects
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
-# settings.py
 LOGIN_URL = '/login/'
-
 
 # Crispy Forms
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -162,10 +175,4 @@ LOGGING = {
             'propagate': True,
         },
     },
-    'myapp': {
-            'handlers': ['file'],
-            'level': 'WARNING',
-            'propagate': True,
-        },
 }
-

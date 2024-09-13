@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5" style="height: 100vh; position: relative; background-image: url('{% static 'images/chat-background.png' %}'); background-size: cover; background-position: center;">
+  <!-- Chat content -->
+  <div class="chat-container" style="height: calc(100% - 100px); display: flex; flex-direction: column; justify-content: space-between;">
+    <!-- Chat Header -->
+    <div class="chat-header" style="display: flex; align-items: center; padding: 10px; background-color: rgba(255, 255, 255, 0.9); border-bottom: 1px solid #ddd;">
+      <h4 class="text-center" style="flex: 1; text-align: center;">Room: {{ room.name }}</h4>
+      <a href="{% url 'chat_rooms' %}" class="btn btn-sm btn-outline-secondary">Back to Rooms</a>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="message-list" id="message-list" style="flex-grow: 1; overflow-y: auto; padding: 20px;">
+      <!-- Loop through messages -->
+      {% for message in messages %}
+        <div class="message-item {% if message.user == user %}my-message{% else %}other-message{% endif %}" style="display: flex; margin-bottom: 20px;">
+          {% if message.user != user %}
+          <div class="profile-icon" style="margin-right: 10px;">
+            <img src="{% static 'images/default_profile.jpg' %}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
+          </div>
+          {% endif %}
+          <div class="message-bubble" style="max-width: 70%; padding: 10px 15px; border-radius: 15px; {% if message.user == user %} background-color: #dcf8c6; margin-left: auto; text-align: left; {% else %} background-color: #ffffff; border: 1px solid #ddd; {% endif %}">
+            <div class="message-content" style="font-size: 14px;">
+              <strong style="font-size: 12px;">{{ message.user.username }}</strong>
+              {% if message.content %}
+                <p class="content" style="margin-top: 5px;">{{ message.content }}</p>
+              {% endif %}
+              {% if message.image %}
+                <img src="{{ message.image.url }}" alt="Sent Image" style="max-width: 100%; max-height: 200px; margin-top: 5px; border-radius: 12px;"> <!-- Added max-height and max-width for the images -->
+              {% endif %}
+              <small style="color: gray; font-size: 10px; float: right;">{{ message.timestamp|date:"H:i" }}</small>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Message Input Section -->
+    <form id="chat-form" action="{% url 'send_message' room.name %}" method="POST" enctype="multipart/form-data" style="padding: 10px; background-color: rgba(255, 255, 255, 0.9); border-top: 1px solid #ddd; display: flex; align-items: center;">
+      {% csrf_token %}
+      <textarea id="message-input" class="form-control message-input" name="message" rows="1" placeholder="Write a message..." style="flex: 1; border-radius: 25px; resize: none; padding-left: 15px; border: 1px solid #ddd;"></textarea>
+      <input type="file" name="image" class="form-control ms-2" accept="image/*" style="display: none;" id="file-input">
+      <label for="file-input" style="cursor: pointer; margin-left: 10px;">
+        <i class="fas fa-paperclip" style="font-size: 20px; color: #888;"></i>
+      </label>
+      <button class="send-button ms-3" type="submit" style="background-color: #25d366; border: none; color: white; padding: 10px; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; margin-left: 10px;">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const roomName = "{{ room.name }}";
+  const chatSocket = new WebSocket(
+      (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws/chat/' + roomName + '/'
+  );
+
+  chatSocket.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      const messageList = document.getElementById('message-list');
+
+      // Create new message element
+      const messageElement = document.createElement('div');
+      messageElement.innerHTML = `<strong>${data.user}</strong>: ${data.message}`;
+      messageElement.classList.add('message-item');
+
+      // Append the message to the message list
+      messageList.appendChild(messageElement);
+
+      // Scroll to bottom after new message
+      messageList.scrollTop = messageList.scrollHeight;
+  };
+
+  chatSocket.onclose = function(e) {
+      console.error('Chat socket closed unexpectedly');
+  };
+
+  document.getElementById('chat-form').onsubmit = function(e) {
+      e.preventDefault();
+      const messageInputDom = document.getElementById('message-input');
+      const message = messageInputDom.value;
+      chatSocket.send(JSON.stringify({
+          'message': message
+      }));
+      messageInputDom.value = '';
+  };
+
+  // Add "Enter" key functionality to send messages
+  const messageInput = document.querySelector('.message-input');
+  messageInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' and !event.shiftKey) {
+      event.preventDefault();  // Prevents adding a new line on Enter
+      document.getElementById('chat-form').submit();  // Submit the form when Enter is pressed
+    }
+  });
+</script>
+
+{% endblock %}

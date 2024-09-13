@@ -7,20 +7,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="NYAGWA SHG - Bringing the community together." />
+    <meta name="keywords" content="SHG, Community, Contributions, Events, Lineage" />
+    <meta property="og:title" content="NYAGWA SHG" />
+    <meta property="og:description" content="Bringing the community together." />
+    <meta property="og:image" content="{% static 'images/og_image.png' %}" />
     <title>{% block title %}NYAGWA SHG{% endblock %}</title>
+
     <!-- Bootstrap CSS -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <!-- Custom CSS -->
     <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
     {% block extra_head %}{% endblock %}
   </head>
   <body>
     <div class="wrapper">
-      <!-- Navbar -->
-      <nav class="navbar navbar-expand-lg navbar-dark">
+      <!-- Sticky Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
           <a class="navbar-brand" href="/">NYAGWA SHG</a>
           <button
@@ -37,23 +44,26 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'lineage' %}">Lineage</a> <!-- Link to Lineage -->
+                <a class="nav-link {% if request.resolver_match.url_name == 'lineage' %}active{% endif %}" href="{% url 'lineage' %}">Lineage</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'events_page' %}">Events</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'events_page' %}active{% endif %}" href="{% url 'events_page' %}">Events</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'contributions_page' %}">Contributions</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'contributions_page' %}active{% endif %}" href="{% url 'contributions_page' %}">Contributions</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'members_page' %}">Members</a> <!-- New link to Members -->
+                <a class="nav-link {% if request.resolver_match.url_name == 'members_page' %}active{% endif %}" href="{% url 'members_page' %}">Members</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'chat_rooms' %}active{% endif %}" href="{% url 'chat_rooms' %}">Chat</a>
               </li>
               {% if user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'profile' user.id %}">Profile</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' user.id %}">Profile</a>
               </li>
               {% if user.is_staff %}
               <li class="nav-item">
@@ -70,10 +80,10 @@
               </li>
               {% else %}
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Login</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'signup' %}active{% endif %}" href="{% url 'signup' %}">Sign Up</a>
               </li>
               {% endif %}
             </ul>
@@ -87,13 +97,11 @@
       </div>
 
       <!-- Footer -->
-      <footer class="footer text-center">
-        <div class="container p-4">
-          <p class="text-center mb-0">
-            &copy; 2024 NYAGWA SHG. All rights reserved.
-          </p>
-          <p class="text-center mb-0">
-            Developed by <a href="https://mockydigital.com/" target="_blank">MockyDigital</a>
+      <footer class="footer bg-dark text-white mt-5 py-3 text-center">
+        <div class="container">
+          <p class="mb-0">&copy; 2024 NYAGWA SHG. All rights reserved.</p>
+          <p class="mb-0">
+            Developed by <a href="https://mockydigital.com/" target="_blank" class="text-light">MockyDigital</a>
           </p>
         </div>
       </footer>
