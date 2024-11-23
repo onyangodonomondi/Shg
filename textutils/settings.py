@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load the .secure file
-load_dotenv(dotenv_path=BASE_DIR / '.secure')
+load_dotenv(dotenv_path=BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -24,7 +24,7 @@ DEBUG = ENVIRONMENT == 'development'
 if DEBUG:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 else:
-    ALLOWED_HOSTS = ["nyagwa.co.ke", "www.nyagwa.co.ke", "172.233.249.179"]
+    ALLOWED_HOSTS = ["nyagwa.co.ke", "www.nyagwa.co.ke"]
 
 # ASGI Application for Django Channels
 ASGI_APPLICATION = 'textutils.asgi.application'
@@ -41,7 +41,7 @@ CHANNEL_LAYERS = {
 
 # Application definition
 INSTALLED_APPS = [
-    'channels',  # Add channels to the installed apps
+    
     'chat',  # Add your chat app
     'django.contrib.admin',
     'django.contrib.auth',
@@ -50,8 +50,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'members',
-    "admin_interface",
-    "colorfield",
+    
+    
     'widget_tweaks',
     'crispy_forms',
     'crispy_bootstrap4',
